@@ -1,10 +1,10 @@
-import React from 'react';
-import CHTNavbar from './components/CHTNavbar';
+import React from "react";
+import CHTNavbar from "./components/CHTNavbar";
 import { Route, Switch } from "react-router-dom";
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Profile from './pages/Profile';
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
