@@ -13,6 +13,7 @@ const Home = () => {
           <p>
             As a central hub for COVID-19 data, keep up with important news and
             statistics about the virus and vaccine while tracking your symptoms.
+            Update your test results and learn more about contact tracing.
           </p>
           <Button
             href="/signup"
@@ -91,9 +92,9 @@ const Home = () => {
                 style={{ maxHeight: 260 }}
               />
               <Card.Body style={{ color: "white" }}>
-                <Card.Title>COVID-19 Vaccine</Card.Title>
+                <Card.Title>News</Card.Title>
                 <Card.Text>
-                  Stay up-to-date with information and data on the vaccine.
+                  Read up on news about COVID-19 and the vaccine.
                 </Card.Text>
                 <Button
                   style={{
@@ -118,7 +119,8 @@ const Home = () => {
           <h5>Stay on top of your health.</h5>
           <p>
             If you believe you've come in contact with COVID-19 or have tested
-            postive, quarantine and log your symptoms daily.
+            postive, input your test results, quarantine, and log your symptoms
+            daily.
           </p>
           <Button
             href="/profile"
