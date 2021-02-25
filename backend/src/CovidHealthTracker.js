@@ -1,18 +1,27 @@
 const path = require('path');
 
 const express = require('express');
+const cors = require('cors');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 
 const IndexRouter = require('./routers/IndexRouter');
-const UsersRouter = require('./routers/UsersRouter');
+const AuthRouter = require('./routers/AuthRouter');
+const ErrorRouter = require('./routers/ErrorRouter');
 
 class CovidHealthTracker extends express {
 
-    constructor() {
+    constructor(database, configuration) {
         super();
 
-        // Middlewares
+        // Database
+        this.database = database;
+
+        // Port
+        this.set('port', configuration.PORT);
+
+        // Middleware
+        this.use(cors());
         this.use(logger('dev'));
         this.use(express.json());
         this.use(express.urlencoded({ extended: false }));
@@ -20,8 +29,10 @@ class CovidHealthTracker extends express {
         this.use(express.static(path.join(__dirname, '..', 'public')));
 
         // Routers
-        this.use('/', new IndexRouter());
-        this.use('/users', new UsersRouter());
+        this.use('/auth', new AuthRouter(database, configuration));
+        this.use('*', new IndexRouter());
+        this.use(new ErrorRouter(configuration));
+
     }
 
 }

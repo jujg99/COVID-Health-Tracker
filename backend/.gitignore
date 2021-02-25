@@ -1,5 +1,13 @@
 # Node Modules
 node_modules/
 
-# misc
+# Build
+public/*
+!public/.REACT_BUILD_HERE
+
+# .env Files
+.env*
+!.env.template
+
+# Misc
 *.DS_Store

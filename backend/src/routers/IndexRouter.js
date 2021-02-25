@@ -1,17 +1,25 @@
+const path = require('path');
+
 const { Router } = require('express');
 
 class IndexRouter extends Router {
 
-  constructor() {
-    super();
+    constructor() {
+        super();
 
-    // Routes
-    this.get('/', IndexRouter.getDefaultRoute);
-  }
+        // State
+        this.build = path.resolve(__dirname, '..', '..', 'public', 'index.html');
 
-  static getDefaultRoute(req, res, next) {
-    res.send('index');
-  };
+        // this Bind
+        this.getDefaultRoute = IndexRouter.getDefaultRoute.bind(this);
+
+        // Routes
+        this.get('/', this.getDefaultRoute);
+    }
+
+    static getDefaultRoute(req, res, next) {
+        res.sendFile(this.build);
+    }
 
 }
 

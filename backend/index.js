@@ -1,44 +1,18 @@
 #!/usr/bin/env node
-const http = require('http');
-
+const Configuration = require('./src/config/Configuration');
+const Database = require('./src/external/Database');
 const CovidHealthTracker = require('./src/CovidHealthTracker');
+const Server = require('./src/config/Server');
 
-class Application {
+// Configuration
+const configuration = new Configuration();
 
-  static main() {
-    // Environmental Variables
-    const port = process.env.PORT || 3000;
+// Database
+const database = new Database(configuration);
 
-    // Application
-    const app = new CovidHealthTracker();
-    app.set('port', port);
+// Application
+const app = new CovidHealthTracker(database, configuration);
 
-    // Server
-    const server = http.createServer(app);
-    server.listen(port);
-    server.on('listening', Application.onListening(server));
-    server.on('error', Application.onError);
-  }
+// Server
+(new Server(app, configuration)).run();
 
-  static onListening(server) {
-    return () => console.log(`Listening on port ${server.address().port}`);
-  }
-
-  static onError(error) {
-    if (error.syscall !== 'listen') {
-      throw error;
-    }
-    if (error.code === 'EACCES') {
-      console.error(`Port ${port} requires elevated privileges`);
-      process.exit(1);
-    }
-    if (error.code === 'EADDRINUSE') {
-      console.error(`Port ${port} is already in use`);
-      process.exit(1);
-    }
-    throw error;
-  };
-
-}
-
-Application.main();
