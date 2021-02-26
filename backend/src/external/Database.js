@@ -14,6 +14,25 @@ class Database {
 
     }
 
+    createGetUserQuery(username) {
+        return (`
+            SELECT
+                BIN_TO_UUID(id) id,
+                username,
+                password
+            FROM users
+            WHERE username = '${username}'
+        `);
+    }
+
+    createInsertUserQuery(username, password) {
+        const encryptedPassword = Encryption.encrypt(password, this.SALT);
+        return (`
+            INSERT INTO users ( id, username, password )
+            VALUES ( UUID_TO_BIN(UUID()), '${username}', '${encryptedPassword}')
+        `);
+    }
+
     getUser(username) {
         return new Promise((resolve, reject) => {
             const connection = mysql.createConnection({
@@ -23,6 +42,7 @@ class Database {
             });
             connection.connect((err) => {
                 if (err) {
+                    connection.end();
                     return reject(err);
                 }
                 connection.query('USE cht');
@@ -37,7 +57,6 @@ class Database {
                     }
                     return resolve(rows[0]);
                 });
-
             });
         });
     }
@@ -51,11 +70,11 @@ class Database {
             });
             connection.connect((err) => {
                 if (err) {
+                    connection.end();
                     return reject(err);
                 }
                 connection.query('USE cht');
-                const matchQuery = `SELECT * FROM users WHERE username = '${username}'`;
-                connection.query(matchQuery, (err, rows) => {
+                connection.query(this.createGetUserQuery(username), (err, rows) => {
                     connection.end();
                     if (err) {
                         return reject(err);
@@ -81,17 +100,17 @@ class Database {
             });
             connection.connect(async (err) => {
                 if (err) {
+                    connection.end();
                     return reject(err);
                 }
                 try {
                     const user = await this.getUser(username);
                     if (user === null) {
+                        connection.end();
                         return resolve(null);
                     }
                     connection.query('USE cht');
-                    const encryptedPassword = Encryption.encrypt(password, this.SALT);
-                    const insertQuery = `INSERT INTO users ( username, password ) values ('${username}', '${encryptedPassword}')`;
-                    connection.query(insertQuery, function (err, rows) {
+                    connection.query(this.createInsertUserQuery(username, password), function (err, rows) {
                         connection.end();
                         if (err) {
                             return reject(err);
@@ -103,6 +122,7 @@ class Database {
                         });
                     });
                 } catch (error) {
+                    connection.end();
                     return reject(error);
                 }
             });

@@ -11,7 +11,6 @@ class Server {
         // this Bind
         this.onListening = this.onListening.bind(this);
         this.onError = this.onError.bind(this);
-        this.onExit = this.onExit.bind(this);
 
     }
 
@@ -19,9 +18,6 @@ class Server {
         this.server.listen(this.port);
         this.server.on('listening', this.onListening);
         this.server.on('error', this.onError);
-        process.on('exit', this.onExit);
-        process.on('SIGINT', this.onExit);
-        process.on('SIGTERM', this.onExit);
     }
 
     onListening() {
@@ -41,10 +37,6 @@ class Server {
             process.exit(1);
         }
         throw error;
-    }
-
-    onExit() {
-        console.log('Exiting Application!');
     }
 
 }
