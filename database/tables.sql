@@ -3,6 +3,7 @@ USE `cht`;
 CREATE TABLE `users` (
   `username` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL,
+  `ID` BINARY(16) NOT NULL,
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
   `county` varchar(50) NOT NULL,
