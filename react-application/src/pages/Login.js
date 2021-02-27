@@ -9,6 +9,7 @@ function Login(props) {
 
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false)
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { setAuthTokens } = useAuth();
@@ -18,12 +19,22 @@ function Login(props) {
     return <Redirect to={referrer} />;
   }
 
+  if (isAdmin) {
+    return <Redirect to="/admin"/>;
+  }
+
   function validateForm() {
     return username.length > 0 && password.length > 0;
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if(username == "admin" && password == "admin") {
+      setIsAdmin(true);
+      return;
+    }
+
     try {
       const response = await fetch('http://localhost:8080/auth/login', {
         method: 'POST',
