@@ -6,6 +6,7 @@ import { lighten, makeStyles } from '@material-ui/core/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@material-ui/core';
 import { Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
+import SearchBar from "material-ui-search-bar";
 import { Tab, Tabs } from 'react-bootstrap'
 
 const Admin = () => {
@@ -58,7 +59,7 @@ const Admin = () => {
     }
 
     const headCells = [
-        { id: 'name',disablePadding: true, label: 'Name' },
+        { id: 'name', disablePadding: true, label: 'Name' },
         { id: 'username', disablePadding: false, label: 'Username' },
         { id: 'email', disablePadding: false, label: 'Email' },
         { id: 'dob', disablePadding: false, label: 'Date of Birth' },
@@ -253,8 +254,21 @@ const Admin = () => {
     };
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
-
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+    const [filteredRows, setFilteredRows] = useState(rows);
+    const [searched, setSearched] = useState("");
+
+    const requestSearch = (searchedVal) => {
+        const filter = rows.filter((row) => {
+            return row.name.toLowerCase().includes(searchedVal.toLowerCase());
+        });
+        setFilteredRows(filter);
+    };
+
+    const cancelSearch = () => {
+        setSearched("");
+        requestSearch(searched);
+    };
 
     return (
         <Tabs
@@ -265,7 +279,14 @@ const Admin = () => {
             <Tab eventKey="userlist" title="User List">
                 <div className={classes.root}>
                     <Paper className={classes.paper}>
+                        <SearchBar
+                            placeholder='Search Name'
+                            value={searched}
+                            onChange={(searchVal) => requestSearch(searchVal)}
+                            onCancelSearch={() => cancelSearch()}
+                        />
                         <EnhancedTableToolbar numSelected={selected.length} />
+
                         <TableContainer>
                             <Table
                                 className={classes.table}
@@ -283,7 +304,7 @@ const Admin = () => {
                                     rowCount={rows.length}
                                 />
                                 <TableBody>
-                                    {stableSort(rows, getComparator(order, orderBy))
+                                    {stableSort(filteredRows, getComparator(order, orderBy))
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row, index) => {
                                             const isItemSelected = isSelected(row.name);
