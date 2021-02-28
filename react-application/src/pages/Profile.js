@@ -11,6 +11,7 @@ import {
   Table,
   Modal,
   Form,
+  Alert,
 } from "react-bootstrap";
 import { useAuth } from "../context/auth";
 import jwt from "jwt-decode";
@@ -23,6 +24,8 @@ const Profile = () => {
   const [showSymptom, setShowSymptom] = useState(false);
   const [showTest, setShowTest] = useState(false);
   const [showAddInfo, setAddInfo] = useState(false);
+
+  const [showTempAlert, setShowTempAlert] = useState(false);
 
   //possible symptoms to be logged
   const [temperature, setTemperature] = useState("");
@@ -83,8 +86,11 @@ const Profile = () => {
     },
   ];
 
-  function logOut() {
-    setAuthTokens(null);
+  function submitSymptoms() {
+    if (!isNaN(temperature)) {
+    } else {
+      setShowTempAlert(true);
+    }
   }
 
   return (
@@ -314,10 +320,13 @@ const Profile = () => {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group controlId="temperature">
-              <Form.Label>Temperature</Form.Label>
+            <Form.Group controlId="temperature" type="number">
+              <Form.Label>Temperature (&#176;Fahrenheit)</Form.Label>
               <Form.Control onChange={(e) => setTemperature(e.target.value)} />
             </Form.Group>
+            <Alert show={showTempAlert} variant="danger">
+              <p>Please input a valid temperature.</p>
+            </Alert>
             <br />
             <p>Please select the symptoms you are experiencing.</p>
             <Form.Check label={"Cough"} onChange={(e) => setCough(true)} />
@@ -356,11 +365,17 @@ const Profile = () => {
         <Modal.Footer>
           <Button
             style={{ background: "gray", border: "gray" }}
-            onClick={() => setShowSymptom(false)}
+            onClick={() => {
+              setShowSymptom(false);
+              setShowTempAlert(false);
+            }}
           >
             Close
           </Button>
-          <Button style={{ background: "#5340b3", border: "#5340b3" }}>
+          <Button
+            style={{ background: "#5340b3", border: "#5340b3" }}
+            onClick={submitSymptoms}
+          >
             Submit
           </Button>
         </Modal.Footer>
@@ -404,7 +419,7 @@ const Profile = () => {
         keyboard={false}
       >
         <Modal.Header>
-          <Modal.Title>Add Test Results</Modal.Title>
+          <Modal.Title>Add More Information</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
