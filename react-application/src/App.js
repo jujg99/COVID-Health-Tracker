@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
+import Admin from "./pages/Admin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/auth";
 
@@ -28,6 +29,9 @@ function App() {
             <Route exact path="/login" render={(props) => <Login {...props} />} />
             <Route exact path="/signup">
               <Signup />
+            </Route>
+            <Route exact path="/admin">
+              <Admin />
             </Route>
             <ProtectedRoute exact path="/profile" component={Profile} />
             <Route path="/">
