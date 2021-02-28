@@ -408,6 +408,11 @@ const Profile = () => {
         </Modal.Header>
         <Modal.Body>
           <Form>
+            <Form.Group controlId="age">
+              <Form.Label>Age</Form.Label>
+              <Form.Control />
+            </Form.Group>
+            <br />
             <p>Do you have any of the following:</p>
             <li>Cancer</li>
             <li>Chronic kidney disease</li>
