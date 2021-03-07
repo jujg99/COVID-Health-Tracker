@@ -3,7 +3,7 @@ USE cht;
 CREATE TABLE users (
   username varchar(50) NOT NULL,
   password varchar(64) NOT NULL,
-  id varchar(16) NOT NULL,
+  id binary(16) NOT NULL,
   admin boolean,
   first_name varchar(50) NOT NULL,
   last_name varchar(50) NOT NULL,

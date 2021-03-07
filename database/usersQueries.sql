@@ -5,4 +5,5 @@ select * from users;
 select username, first_name, last_name, county from users;
 -- Insert statment
 INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city)
-VALUES ('KittenMan', 'SneakyKittyPassword', '10010', TRUE, 'Sean', 'Guo', 22, FALSE, 'New York');
+VALUES ('KittenMan', 'ae54cd65486f129e2f673bea22c3cc542302a2e7194ffda09bb8876c4bc3080b',
+ '10010', TRUE, 'Sean', 'Guo', 22, FALSE, 'New York');
