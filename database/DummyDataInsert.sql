@@ -1,44 +1,44 @@
 -- User Database Inserts
 #1 Password is 'SneakyKittyGuy'
-INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city)
+INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city, state)
 VALUES ('KittenMan', 'ae54cd65486f129e2f673bea22c3cc542302a2e7194ffda09bb8876c4bc3080b',
- '10010', TRUE, 'Sean', 'Guo', 22, FALSE, 'New York');
+ '10010', TRUE, 'Sean', 'Guo', 22, FALSE, 'New York', 'NY');
 #2 Password is 'B'
-INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city)
+INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city, state)
 VALUES ('A', '4859a8c7c37fac9b1235eaff6681b50b880ead928169b884f8a85ca858df204f',
-uuid_to_bin(uuid()), FALSE, 'Bob', 'Marley', 58, TRUE, 'Frankfurt');
+uuid_to_bin(uuid()), FALSE, 'Bob', 'Marley', 58, TRUE, 'Frankfurt', 'BL');
 #3 Password is 'OMGsoSneaky'
-INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city)
+INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city, state)
 VALUES ('16yoEdgelord', 'e20367867e1d8da2ccb8dfac05dacda9e9a7bd7fec907ae18551a3e106a209b2',
-uuid_to_bin(uuid()), FALSE, 'Echo', 'Noir', 16, FALSE, 'Boston');
+uuid_to_bin(uuid()), FALSE, 'Echo', 'Noir', 16, FALSE, 'Boston', 'MA');
 #4 Password is 'ABCD1234'
-INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city)
+INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city, state)
 VALUES ('SimpleSadMan', 'fd596f666aa5b60134deed40065f90944f497b8ada7e18879e52a47b5a311695',
-uuid_to_bin(uuid()), FALSE, 'Craig', 'Caruso', 45, TRUE, 'New York');
+uuid_to_bin(uuid()), FALSE, 'Craig', 'Caruso', 45, TRUE, 'New York', 'NY');
 #5 Password is 'HulaHula12'
-INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city)
+INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city, state)
 VALUES ('Bailamos', 'fc58a9224878c5e62bf999c6761f64b11f5bb5cd66f8b0d2f9cec56f862d3c81',
-uuid_to_bin(uuid()), TRUE, 'Enrique', 'Ramos', 33, FALSE, 'Tampa Bay');
+uuid_to_bin(uuid()), TRUE, 'Enrique', 'Ramos', 33, FALSE, 'Tampa Bay', 'FL');
 #6 Password is 'NM23'
-INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city)
+INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city, state)
 VALUES ('NotMacho11', 'ec14490ca945f3bc554b0c178f1c106e96401e0d55537d634cb750aaf948a56a',
-uuid_to_bin(uuid()), FALSE, 'Sammy', 'Kramer', 12, TRUE, 'Boston');
+uuid_to_bin(uuid()), FALSE, 'Sammy', 'Kramer', 12, TRUE, 'Boston', 'MA');
 #7 Password is 'H1Z1'
-INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city)
+INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city, state)
 VALUES ('AbbyA', '1d10c53472e77166158fed02850da5ff4251fe4d9c01ed790519a89201d6c28b',
-uuid_to_bin(uuid()), FALSE, 'Abby', 'Agumon', 24, FALSE, 'Toledo');
+uuid_to_bin(uuid()), FALSE, 'Abby', 'Agumon', 24, FALSE, 'Toledo', 'CA');
 #8 Password is 'password'
-INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city)
+INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city, state)
 VALUES ('Uther', '246d71a7f3bb3be00a99c38d122a19cf883d3f79b79e706a2c1643ea55252008',
-uuid_to_bin(uuid()), FALSE, 'Uther', 'Uthergurd', 56, FALSE, 'Tyre');
+uuid_to_bin(uuid()), FALSE, 'Uther', 'Uthergurd', 56, FALSE, 'Tyre', 'FL');
 #9 Password is 'SY19'
-INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city)
+INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city, state)
 VALUES ('syall', '2e39489c22e79a5a683254f3d8b999666be52cd75f98ffb88cc816024eb74d7d',
-uuid_to_bin(uuid()), TRUE, 'Steven', 'Yuan', 82, TRUE, 'Jersey City');
+uuid_to_bin(uuid()), TRUE, 'Steven', 'Yuan', 82, TRUE, 'Jersey City', 'NJ');
 #10 Password is 'sg001'
-INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city)
+INSERT INTO users (username, password, id, admin, first_name, last_name, age, atRisk, city, state)
 VALUES ('KittenFeeFee', '7ce9fa5800994bf871e0d800a5ab97f92d63855c8ba38f88b5bb9f37a1d18904',
-uuid_to_bin(uuid()), TRUE, 'Shawn', 'Gwoah', 25, FALSE, 'Highland Park');
+uuid_to_bin(uuid()), TRUE, 'Shawn', 'Gwoah', 25, FALSE, 'Highland Park', 'NJ');
 
 
 -- Tests Database Inserts
@@ -127,32 +127,32 @@ true, false, true, true, false, 'So handsome, such a beautiful man');
 
 -- Travels Database Inserts
 #1 
-INSERT INTO travels (username, date, city)
-VALUES ('KittenMan', '2020-10-05', 'Philedelphia');
+INSERT INTO travels (username, date, city, state)
+VALUES ('KittenMan', '2020-10-05', 'Philedelphia', 'PA');
 #2
-INSERT INTO travels (username, date, city)
-VALUES ('A', '2019-04-24', 'Trenton');
+INSERT INTO travels (username, date, city, state)
+VALUES ('A', '2019-04-24', 'Trenton', 'NJ');
 #3
-INSERT INTO travels (username, date, city)
-VALUES ('16yoEdgelord', '2020-03-13', 'Cancun');
+INSERT INTO travels (username, date, city, state)
+VALUES ('16yoEdgelord', '2020-03-13', 'Cancun', 'MX');
 #4
-INSERT INTO travels (username, date, city)
-VALUES ('SimpleSadMan', '2020-09-03', 'Las Vegas');
+INSERT INTO travels (username, date, city, state)
+VALUES ('SimpleSadMan', '2020-09-03', 'Las Vegas', 'NV');
 #5
-INSERT INTO travels (username, date, city)
-VALUES ('Bailamos', '2020-04-16', 'Los Santos');
+INSERT INTO travels (username, date, city, state)
+VALUES ('Bailamos', '2020-04-16', 'Los Santos', 'CA');
 #6
-INSERT INTO travels (username, date, city)
-VALUES ('NotMacho11', '2020-02-11', 'Cambridge');
+INSERT INTO travels (username, date, city, state)
+VALUES ('NotMacho11', '2020-02-11', 'Cambridge', 'MA');
 #7
-INSERT INTO travels (username, date, city)
-VALUES ('AbbyA', '2020-06-20', 'Cairo');
+INSERT INTO travels (username, date, city, state)
+VALUES ('AbbyA', '2020-06-20', 'Cairo', 'EGP');
 #8
-INSERT INTO travels (username, date, city)
-VALUES ('Uther', '2020-09-15', 'Sovesty');
+INSERT INTO travels (username, date, city, state)
+VALUES ('Uther', '2020-09-15', 'Sovesty', 'RU');
 #9
-INSERT INTO travels (username, date, city)
-VALUES ('syall', '2020-02-05', 'Piscataway');
+INSERT INTO travels (username, date, city, state)
+VALUES ('syall', '2020-02-05', 'Piscataway', 'NJ');
 #10
-INSERT INTO travels (username, date, city)
-VALUES ('KittenFeeFee', '2020-02-05', 'Piscataway');
+INSERT INTO travels (username, date, city, state)
+VALUES ('KittenFeeFee', '2020-02-05', 'Piscataway', 'NJ');
