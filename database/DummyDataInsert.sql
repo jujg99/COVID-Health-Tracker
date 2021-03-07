@@ -97,7 +97,7 @@ VALUES ('SimpleSadMan', '2019-08-18', 100, false, true, true, false,
 #5
 INSERT INTO symptoms (username, date, temperature, cough, shortBreath, fatigue,
 bodyAche, tasteLoss, soreThroat, congest, nausea, other)
-VALUES ('Baliamos', '2020-05-16', 95, false, false, false, false,
+VALUES ('Bailamos', '2020-05-16', 95, false, false, false, false,
  false, false, false, false, 'Has been taken over by the rhythm');
 #6
 INSERT INTO symptoms (username, date, temperature, cough, shortBreath, fatigue,
