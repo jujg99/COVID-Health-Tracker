@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/auth";
@@ -34,6 +35,7 @@ function App() {
               <Admin />
             </Route>
             <ProtectedRoute exact path="/profile" component={Profile} />
+            <ProtectedRoute exact path="/settings" component={Settings} />
             <Route path="/">
               <Home />
             </Route>
