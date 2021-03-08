@@ -27,8 +27,11 @@ const CHTNavbar = () => {
         <LinkContainer to="/#">
           <Nav.Link>Data</Nav.Link>
         </LinkContainer>
-        <LinkContainer to="/#">
+        <LinkContainer to="/testing">
           <Nav.Link>Testing</Nav.Link>
+        </LinkContainer>
+        <LinkContainer to="/vaccine">
+          <Nav.Link>Vaccine</Nav.Link>
         </LinkContainer>
         <LinkContainer to="/#">
           <Nav.Link>News</Nav.Link>
