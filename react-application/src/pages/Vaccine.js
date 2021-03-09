@@ -27,7 +27,8 @@ export default class Vaccine extends Component {
   }
 
   findVaccine = () => {
-    if (!this.state.zip) {
+    console.log(/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(this.state.zip));
+    if (!/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(this.state.zip)) {
       this.setState({
         noZipAlert: true,
       });
