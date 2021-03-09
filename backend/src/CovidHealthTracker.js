@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 
 const IndexRouter = require("./routers/IndexRouter");
 const AuthRouter = require("./routers/AuthRouter");
+const UserRouter = require("./routers/UserRouter");
 const ErrorRouter = require("./routers/ErrorRouter");
 const LocationRouter = require("./routers/LocationRouter");
 
@@ -30,6 +31,7 @@ class CovidHealthTracker extends express {
 
     // Routers
     this.use("/auth", new AuthRouter(database, configuration));
+    this.use("/user", new UserRouter(database));
     this.use("/location", new LocationRouter(configuration));
     this.use("*", new IndexRouter());
     this.use(new ErrorRouter(configuration));
