@@ -7,10 +7,12 @@ import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
+import Testing from "./pages/Testing";
+import Vaccine from "./pages/Vaccine";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/auth";
 
-const CHT_TOKENS = 'CHT-tokens';
+const CHT_TOKENS = "CHT-tokens";
 
 function App() {
   const existingTokens = JSON.parse(localStorage.getItem(CHT_TOKENS));
@@ -27,12 +29,22 @@ function App() {
         <Router>
           <CHTNavbar />
           <Switch>
-            <Route exact path="/login" render={(props) => <Login {...props} />} />
+            <Route
+              exact
+              path="/login"
+              render={(props) => <Login {...props} />}
+            />
             <Route exact path="/signup">
               <Signup />
             </Route>
             <Route exact path="/admin">
               <Admin />
+            </Route>
+            <Route exact path="/testing">
+              <Testing />
+            </Route>
+            <Route exact path="/vaccine">
+              <Vaccine />
             </Route>
             <ProtectedRoute exact path="/profile" component={Profile} />
             <ProtectedRoute exact path="/settings" component={Settings} />
