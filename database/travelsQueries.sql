@@ -1,9 +1,9 @@
 use cht;
 -- Select all data from travels
 select * from travels;
--- Select all users that travelled to a given county on a given date
-select username, date, city from travels
-where county = 'Namasu' and date = '2020-10-05';
--- Insert statement
-INSERT INTO travels (username, date, city)
-VALUES ('KittenMan', '2020-10-05', 'New York');
+
+-- Select all travel data that occured before 5/02/2020
+select * from travels where date < '2020-05-02';
+
+-- Select all travel data that occured between 5/02/2020 and 12/30/2019
+select * from travels where date < '2020-05-02' and date > '2019-12-30';
