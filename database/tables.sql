@@ -27,7 +27,7 @@ CREATE TABLE travels (
   username varchar(50) NOT NULL,
   date date NOT NULL,
   city varchar(50) NOT NULL,
-  state varchar(3) NOT NULL,
+  state varchar(2) NOT NULL,
   KEY usernameTravels_idx (username),
   CONSTRAINT usernameTravels FOREIGN KEY (username) REFERENCES users (username)
 );
