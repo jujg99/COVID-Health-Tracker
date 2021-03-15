@@ -86,7 +86,7 @@ class AuthRouter extends Router {
                 res.status(401);
                 return res.json(info);
             }
-            const body = { id: user.id, user: user.username };
+            const body = { id: user.id, user: user.username, admin: user.admin };
             const token = jwt.sign({ user: body }, this.configuration.DB_SECRET);
             return res.json({ token });
         })(req, res, next);
@@ -103,7 +103,7 @@ class AuthRouter extends Router {
                     if (error) {
                         return next(error);
                     }
-                    const body = { id: user.id, user: user.username };
+                    const body = { id: user.id, user: user.username, admin: user.admin };
                     const token = jwt.sign({ user: body }, this.configuration.DB_SECRET);
                     return res.json({ token });
                 });

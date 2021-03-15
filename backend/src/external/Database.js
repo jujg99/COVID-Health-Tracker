@@ -19,7 +19,8 @@ class Database {
             SELECT
                 BIN_TO_UUID(id) id,
                 username,
-                password
+                password,
+                admin
             FROM users
             WHERE username = '${username}'
         `);
@@ -213,7 +214,8 @@ class Database {
                         return resolve({
                             username,
                             password: encryptedPassword,
-                            id: user.id
+                            id: user.id,
+                            admin: user.admin
                         });
                     });
                 } catch (error) {
