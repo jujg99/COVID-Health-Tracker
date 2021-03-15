@@ -25,11 +25,32 @@ class Database {
         `);
     }
 
-    createInsertUserQuery(username, password) {
-        const encryptedPassword = Encryption.encrypt(password, this.SALT);
+    createInsertUserQuery(username, encryptedPassword, body) {
         return (`
-            INSERT INTO users ( id, username, password )
-            VALUES ( UUID_TO_BIN(UUID()), '${username}', '${encryptedPassword}')
+            INSERT INTO users (
+                username,
+                password,
+                id,
+                admin,
+                first_name,
+                last_name,
+                age,
+                atRisk,
+                city,
+                state
+            )
+            VALUES (
+                '${username}',
+                '${encryptedPassword}',
+                UUID_TO_BIN(UUID()),
+                FALSE,
+                '${body.first_name}',
+                '${body.last_name}',
+                ${body.age},
+                FALSE,
+                '${body.city}',
+                '${body.state}'
+            )
         `);
     }
 
@@ -163,7 +184,7 @@ class Database {
         });
     }
 
-    insertUser(username, password) {
+    insertUser(username, password, body) {
         return new Promise((resolve, reject) => {
             const connection = mysql.createConnection({
                 host: this.DB_HOST,
@@ -177,20 +198,22 @@ class Database {
                 }
                 try {
                     const user = await this.getUser(username);
-                    if (user === null) {
+                    if (user !== null) {
                         connection.end();
                         return resolve(null);
                     }
                     connection.query('USE cht');
-                    connection.query(this.createInsertUserQuery(username, password), function (err, rows) {
+                    const encryptedPassword = Encryption.encrypt(password, this.SALT);
+                    connection.query(this.createInsertUserQuery(username, encryptedPassword, body), async (err) => {
                         connection.end();
                         if (err) {
                             return reject(err);
                         }
+                        const user = await this.getUser(username);
                         return resolve({
                             username,
                             password: encryptedPassword,
-                            id: rows[0].id
+                            id: user.id
                         });
                     });
                 } catch (error) {

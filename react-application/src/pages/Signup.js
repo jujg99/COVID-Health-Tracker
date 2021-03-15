@@ -91,14 +91,10 @@ function Signup() {
                 setSignedUp(true);
                 setErrorMessage("");
             } else {
-                setErrorMessage(
-                    <p>{response.message}</p>
-                );
+                setErrorMessage(<span>{data.message}</span>);
             }
         } catch (error) {
-            setErrorMessage(
-                <p>Problem with server, please try again.</p>
-            );
+            setErrorMessage(<span>Problem with server, please try again.</span>);
         }
     }
 
