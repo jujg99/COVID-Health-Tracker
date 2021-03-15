@@ -97,7 +97,7 @@ function Signup() {
             }
         } catch (error) {
             setErrorMessage(
-                <p>{error.message}</p>
+                <p>Problem with server, please try again.</p>
             );
         }
     }
