@@ -140,7 +140,7 @@ const Profile = () => {
 
   //test result input
   const [date, setDate] = useState(new Date());
-  const [testResult, setTestResult] = useState(false);
+  const [testResult, setTestResult] = useState("Negative");
   const [testType, setTestType] = useState("");
 
   useEffect(() => {
@@ -214,6 +214,7 @@ const Profile = () => {
     return axios
       .post("http://localhost:8080/profile/submitTestResults", data)
       .then((response) => {
+        setDate(new Date());
         setCurrentInput("Your test results have been successfully submitted.");
         setShowConfirmation(true);
       })
