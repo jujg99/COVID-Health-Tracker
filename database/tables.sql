@@ -27,10 +27,20 @@ CREATE TABLE `tests` (
   CONSTRAINT `usernameTests` FOREIGN KEY (`username`) REFERENCES `users` (`username`)
 );
 
-CREATE TABLE `symptoms` (
-  `username` varchar(50) NOT NULL,
-  `date` date NOT NULL,
-  `symptoms` varchar(200) NOT NULL,
-  KEY `usernameSymptoms_idx` (`username`),
-  CONSTRAINT `usernameSymptoms` FOREIGN KEY (`username`) REFERENCES `users` (`username`)
+CREATE TABLE symptoms (
+  username varchar(50) NOT NULL,
+  id binary(16) NOT NULL,
+  date date NOT NULL,
+  temperature int(3),
+  cough BOOLEAN,
+  shortBreath BOOLEAN,
+  fatigue BOOLEAN,
+  bodyAche BOOLEAN,
+  tasteLoss BOOLEAN,
+  soreThroat BOOLEAN,
+  congest BOOLEAN,
+  nausea BOOLEAN,
+  other varchar(200),
+  KEY usernameSymptoms_idx (username),
+  CONSTRAINT usernameSymptoms FOREIGN KEY (username) REFERENCES users (username)
 );
