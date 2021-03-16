@@ -37,15 +37,13 @@ function App() {
             <Route exact path="/signup">
               <Signup />
             </Route>
-            <Route exact path="/admin">
-              <Admin />
-            </Route>
             <Route exact path="/testing">
               <Testing />
             </Route>
             <Route exact path="/vaccine">
               <Vaccine />
             </Route>
+            <ProtectedRoute exact path="/admin" component={Admin} admin={true} />
             <ProtectedRoute exact path="/profile" component={Profile} />
             <ProtectedRoute exact path="/settings" component={Settings} />
             <Route path="/">
