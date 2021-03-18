@@ -16,13 +16,14 @@ class AuthRouter extends Router {
 
         // this Bind
         this.setupPassport = AuthRouter.setupPassport.bind(this);
+        this.handleSignUpRoute = AuthRouter.handleSignUpRoute.bind(this);
         this.handleLoginRoute = AuthRouter.handleLoginRoute.bind(this);
 
         // Passport
         this.setupPassport();
 
         // Routes
-        this.post('/signup', ...AuthRouter.handleSignUpRoute());
+        this.post('/signup', this.handleSignUpRoute);
         this.post('/login', this.handleLoginRoute);
     }
 
@@ -58,7 +59,7 @@ class AuthRouter extends Router {
                 if (await this.database.getUser(username)) {
                     return done(null, false, { message: 'Username is already taken.' });
                 }
-                const newUser = await this.database.insertUser(username, password);
+                const newUser = await this.database.insertUser(username, password, req.body);
                 return done(null, newUser);
             } catch (error) {
                 done(error);
@@ -76,16 +77,19 @@ class AuthRouter extends Router {
         }));
     }
 
-    static handleSignUpRoute() {
-        return [
-            passport.authenticate('signup', { session: false }),
-            (req, res, next) => {
-                res.json({
-                    message: 'Signup successful',
-                    user: req.user
-                });
+    static handleSignUpRoute(req, res, next) {
+        passport.authenticate('signup', { session: false }, (err, user, info) => {
+            if (err) {
+                return next(err);
             }
-        ];
+            if (!user) {
+                res.status(401);
+                return res.json(info);
+            }
+            const body = { id: user.id, user: user.username, admin: user.admin };
+            const token = jwt.sign({ user: body }, this.configuration.DB_SECRET);
+            return res.json({ token });
+        })(req, res, next);
     }
 
     static handleLoginRoute(req, res, next) {
@@ -99,7 +103,7 @@ class AuthRouter extends Router {
                     if (error) {
                         return next(error);
                     }
-                    const body = { id: user.id, user: user.username };
+                    const body = { id: user.id, user: user.username, admin: user.admin };
                     const token = jwt.sign({ user: body }, this.configuration.DB_SECRET);
                     return res.json({ token });
                 });
