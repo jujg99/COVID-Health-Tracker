@@ -1,5 +1,6 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Button,
   Col,
@@ -8,89 +9,398 @@ import {
   Row,
   Accordion,
   Card,
-  Table,
   Modal,
   Form,
   Alert,
+  ButtonGroup,
 } from "react-bootstrap";
-import { useAuth } from "../context/auth";
 import jwt from "jwt-decode";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { Link } from "react-router-dom";
+import { useTable, useRowSelect } from "react-table";
+import styled from "styled-components";
 
 const Profile = () => {
-  const { setAuthTokens } = useAuth();
   const currentUser = jwt(localStorage.getItem("CHT-tokens")).user.user;
 
   //modals
   const [showSymptom, setShowSymptom] = useState(false);
   const [showTest, setShowTest] = useState(false);
   const [showAddInfo, setAddInfo] = useState(false);
+  const [editScreen, setEditScreen] = useState(false);
 
   const [showTempAlert, setShowTempAlert] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-  //possible symptoms to be logged
+  const [currentInput, setCurrentInput] = useState(false);
+
+  //symptom input
   const [temperature, setTemperature] = useState("");
   const [cough, setCough] = useState(false);
   const [shortnessOfBreath, setShortnessOfBreath] = useState(false);
   const [fatigue, setFatigue] = useState(false);
   const [muscleBodyAches, setMuscleBodyAches] = useState(false);
-  const [headaches, setHeadaches] = useState(false);
   const [lossOfTaste, setLossOfTaste] = useState(false);
   const [soreThroat, setSoreThroat] = useState(false);
   const [congestion, setCongestion] = useState(false);
   const [nausea, setNausea] = useState(false);
-  const [diarrhea, setDiarrhea] = useState(false);
+  const [other, setOther] = useState("");
 
-  //some dummy data
-  const symptoms = [
-    {
-      date: "2/25/21",
-      temperature: 98.6,
-      cough: false,
-      shortnessOfBreath: false,
-      fatigue: false,
-      muscleBodyAches: false,
-      headaches: false,
-      lossOfTaste: false,
-      soreThroat: false,
-      congestion: false,
-      nausea: false,
-      diarrhea: false,
-    },
-    {
-      date: "2/26/21",
-      temperature: 99.7,
-      cough: true,
-      shortnessOfBreath: false,
-      fatigue: false,
-      muscleBodyAches: false,
-      headaches: false,
-      lossOfTaste: true,
-      soreThroat: false,
-      congestion: false,
-      nausea: false,
-      diarrhea: false,
-    },
-    {
-      date: "2/27/21",
-      temperature: 100.1,
-      cough: true,
-      shortnessOfBreath: true,
-      fatigue: true,
-      muscleBodyAches: true,
-      headaches: true,
-      lossOfTaste: true,
-      soreThroat: true,
-      congestion: true,
-      nausea: true,
-      diarrhea: true,
-    },
-  ];
+  const [symptoms, setSymptoms] = useState([]);
+  const [currentID, setCurrentID] = useState("");
+
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "Date",
+        id: "date",
+        accessor: (d) => d.date.substring(0, 10),
+      },
+      {
+        Header: "Temp",
+        accessor: "temperature",
+      },
+      {
+        Header: "Cough",
+        id: "cough",
+        accessor: (d) => (d.cough ? "Yes" : "No"),
+      },
+      {
+        Header: "Shortness of Breath",
+        id: "shortBreath",
+        accessor: (d) => (d.shortBreath ? "Yes" : "No"),
+      },
+      {
+        Header: "Fatigue",
+        id: "fatigue",
+        accessor: (d) => (d.fatigue ? "Yes" : "No"),
+      },
+      {
+        Header: "Muscle/Body Aches",
+        id: "bodyAche",
+        accessor: (d) => (d.bodyAche ? "Yes" : "No"),
+      },
+      {
+        Header: "Loss of Taste",
+        id: "tasteLoss",
+        accessor: (d) => (d.tasteLoss ? "Yes" : "No"),
+      },
+      {
+        Header: "Sore Throat",
+        id: "soreThroat",
+        accessor: (d) => (d.soreThroat ? "Yes" : "No"),
+      },
+      {
+        Header: "Congestion",
+        id: "congestion",
+        accessor: (d) => (d.congestion ? "Yes" : "No"),
+      },
+      {
+        Header: "Nausea",
+        id: "nausea",
+        accessor: (d) => (d.nausea ? "Yes" : "No"),
+      },
+      {
+        Header: "Other",
+        accessor: "other",
+      },
+    ],
+    []
+  );
+
+  const Styles = styled.div`
+    padding: 1rem;
+
+    table {
+      border-spacing: 0;
+      border: 1px solid black;
+
+      tr {
+        :last-child {
+          td {
+            border-bottom: 0;
+          }
+        }
+      }
+
+      th,
+      td {
+        margin: 0;
+        padding: 0.5rem;
+        border-bottom: 1px solid black;
+        border-right: 1px solid black;
+
+        :last-child {
+          border-right: 0;
+        }
+      }
+    }
+  `;
+
+  //test result input
+  const [date, setDate] = useState(new Date());
+  const [testResult, setTestResult] = useState("Negative");
+  const [testType, setTestType] = useState("");
+
+  useEffect(() => {
+    getSymptoms();
+  }, []);
+
+  function reset() {
+    setTemperature("");
+    setCough(false);
+    setShortnessOfBreath(false);
+    setFatigue(false);
+    setMuscleBodyAches(false);
+    setLossOfTaste(false);
+    setSoreThroat(false);
+    setCongestion(false);
+    setNausea(false);
+    setOther("");
+  }
+
+  function getSymptoms() {
+    return axios
+      .post("http://localhost:8080/profile/symptoms", { username: currentUser })
+      .then((response) => {
+        setSymptoms(response.data.symptoms);
+        console.log(response.data.symptoms);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
 
   function submitSymptoms() {
-    if (!isNaN(temperature)) {
-    } else {
+    if (temperature.length == 0 || isNaN(temperature)) {
       setShowTempAlert(true);
+      return;
     }
+    const data = {
+      username: currentUser,
+      temperature: temperature,
+      cough: cough,
+      shortBreath: shortnessOfBreath,
+      fatigue: fatigue,
+      bodyAche: muscleBodyAches,
+      tasteLoss: lossOfTaste,
+      soreThroat: soreThroat,
+      congestion: congestion,
+      nausea: nausea,
+      other: other,
+    };
+    return axios
+      .post("http://localhost:8080/profile/submitSymptoms", data)
+      .then((response) => {
+        getSymptoms();
+        setCurrentInput("Your symptoms have been successfully submitted.");
+        setShowConfirmation(true);
+        setShowSymptom(false);
+        reset();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  function submitTestResults() {
+    const data = {
+      username: currentUser,
+      date: date,
+      type: testType,
+      result: testResult,
+    };
+    return axios
+      .post("http://localhost:8080/profile/submitTestResults", data)
+      .then((response) => {
+        setDate(new Date());
+        setCurrentInput("Your test results have been successfully submitted.");
+        setShowConfirmation(true);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  const IndeterminateCheckbox = React.forwardRef(
+    ({ indeterminate, ...rest }, ref) => {
+      const defaultRef = React.useRef();
+      const resolvedRef = ref || defaultRef;
+
+      React.useEffect(() => {
+        resolvedRef.current.indeterminate = indeterminate;
+      }, [resolvedRef, indeterminate]);
+
+      return (
+        <>
+          <input type="checkbox" ref={resolvedRef} {...rest} />
+        </>
+      );
+    }
+  );
+
+  function Table({ columns, data }) {
+    // Use the state and functions returned from useTable to build your UI
+    const {
+      getTableProps,
+      getTableBodyProps,
+      headerGroups,
+      rows,
+      prepareRow,
+      selectedFlatRows,
+      state: { selectedRowIds },
+    } = useTable(
+      {
+        columns,
+        data,
+      },
+      useRowSelect,
+      (hooks) => {
+        hooks.visibleColumns.push((columns) => [
+          {
+            id: "selection",
+            Header: () => <div />,
+            Cell: ({ row }) => {
+              if (
+                rows.filter((row) => row.isSelected).length < 1 ||
+                row.isSelected
+              ) {
+                return (
+                  <div>
+                    <IndeterminateCheckbox
+                      {...row.getToggleRowSelectedProps()}
+                    />
+                  </div>
+                );
+              } else {
+                return (
+                  <div>
+                    <IndeterminateCheckbox
+                      checked={false}
+                      readOnly
+                      style={row.getToggleRowSelectedProps().style}
+                    />
+                  </div>
+                );
+              }
+            },
+          },
+          ...columns,
+        ]);
+      }
+    );
+
+    // Render the UI for table
+    return (
+      <>
+        <ButtonGroup>
+          <Button variant="secondary" onClick={() => editRow(selectedFlatRows)}>
+            Edit
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => deleteRow(selectedFlatRows)}
+          >
+            Delete
+          </Button>
+        </ButtonGroup>
+        <br />
+        <br />
+        <table {...getTableProps()}>
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <th {...column.getHeaderProps()}>
+                    {column.render("Header")}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row, i) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()}>
+                  {row.cells.map((cell) => {
+                    return (
+                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </>
+    );
+  }
+
+  function editRow(selectedRow) {
+    if (selectedRow.length == 0) {
+      return;
+    }
+    setTemperature(selectedRow[0].original.temperature);
+    setCough(selectedRow[0].original.cough);
+    setShortnessOfBreath(selectedRow[0].original.shortBreath);
+    setFatigue(selectedRow[0].original.fatigue);
+    setMuscleBodyAches(selectedRow[0].original.bodyAche);
+    setLossOfTaste(selectedRow[0].original.tasteLoss);
+    setSoreThroat(selectedRow[0].original.soreThroat);
+    setCongestion(selectedRow[0].original.congest);
+    setNausea(selectedRow[0].original.nausea);
+    setOther(selectedRow[0].original.other);
+    setCurrentID(selectedRow[0].original.textid);
+    setEditScreen(true);
+  }
+
+  function submitEdit() {
+    const data = {
+      id: currentID,
+      temperature: temperature,
+      cough: cough,
+      shortBreath: shortnessOfBreath,
+      fatigue: fatigue,
+      bodyAche: muscleBodyAches,
+      tasteLoss: lossOfTaste,
+      soreThroat: soreThroat,
+      congestion: congestion,
+      nausea: nausea,
+      other: other,
+    };
+    return axios
+      .post("http://localhost:8080/profile/editSymptom", data)
+      .then((response) => {
+        getSymptoms();
+        setEditScreen(false);
+        setCurrentInput("The row has been successfully edited.");
+        setShowConfirmation(true);
+        reset();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  function deleteRow(selectedRow) {
+    if (selectedRow.length == 0) {
+      return;
+    }
+    const data = {
+      id: symptoms[selectedRow[0].index].textid,
+    };
+    return axios
+      .post("http://localhost:8080/profile/deleteSymptom", data)
+      .then((response) => {
+        setCurrentInput("The row has been successfully deleted.");
+        setShowConfirmation(true);
+        getSymptoms();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   return (
@@ -267,43 +577,21 @@ const Profile = () => {
               </Card>
             </Row>
             <br />
+            <Row className="justify-content-center">
+              <Alert
+                show={showConfirmation}
+                variant="success"
+                onClose={() => setShowConfirmation(false)}
+                dismissible
+              >
+                <Alert.Heading>{currentInput}</Alert.Heading>
+              </Alert>
+            </Row>
+            <br />
             <Row>
-              <Table responsive bordered hover>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Temperature</th>
-                    <th>Cough</th>
-                    <th>Shortness of Breath</th>
-                    <th>Fatigue</th>
-                    <th>Muscle/Body Aches</th>
-                    <th>Headaches</th>
-                    <th>Loss of Taste</th>
-                    <th>Sore Throat</th>
-                    <th>Congestion/Runny Nose</th>
-                    <th>Nausea</th>
-                    <th>Diarrhea</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {symptoms.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.date}</td>
-                      <td>{item.temperature}</td>
-                      <td>{item.cough ? "Yes" : "No"}</td>
-                      <td>{item.shortnessOfBreath ? "Yes" : "No"}</td>
-                      <td>{item.fatigue ? "Yes" : "No"}</td>
-                      <td>{item.muscleBodyAches ? "Yes" : "No"}</td>
-                      <td>{item.headaches ? "Yes" : "No"}</td>
-                      <td>{item.lossOfTaste ? "Yes" : "No"}</td>
-                      <td>{item.soreThroat ? "Yes" : "No"}</td>
-                      <td>{item.congestion ? "Yes" : "No"}</td>
-                      <td>{item.nausea ? "Yes" : "No"}</td>
-                      <td>{item.diarrhea ? "Yes" : "No"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+              <Styles>
+                <Table columns={columns} data={symptoms} />
+              </Styles>
             </Row>
           </Col>
         </Row>
@@ -329,37 +617,36 @@ const Profile = () => {
             </Alert>
             <br />
             <p>Please select the symptoms you are experiencing.</p>
-            <Form.Check label={"Cough"} onChange={(e) => setCough(true)} />
+            <Form.Check label={"Cough"} onChange={(e) => setCough(!cough)} />
             <Form.Check
               label={"Shortness of breath"}
-              onChange={(e) => setShortnessOfBreath(true)}
+              onChange={(e) => setShortnessOfBreath(!shortnessOfBreath)}
             />
-            <Form.Check label={"Fatigue"} onChange={(e) => setFatigue(true)} />
+            <Form.Check
+              label={"Fatigue"}
+              onChange={(e) => setFatigue(!fatigue)}
+            />
             <Form.Check
               label={"Muscle or body aches"}
-              onChange={(e) => setMuscleBodyAches(true)}
-            />
-            <Form.Check
-              label={"Headache"}
-              onChange={(e) => setHeadaches(true)}
+              onChange={(e) => setMuscleBodyAches(!muscleBodyAches)}
             />
             <Form.Check
               label={"Loss of taste"}
-              onChange={(e) => setLossOfTaste(true)}
+              onChange={(e) => setLossOfTaste(!lossOfTaste)}
             />
             <Form.Check
               label={"Sore throat"}
-              onChange={(e) => setSoreThroat(true)}
+              onChange={(e) => setSoreThroat(!soreThroat)}
             />
             <Form.Check
               label={"Congestion or runny nose"}
-              onChange={(e) => setCongestion(true)}
+              onChange={(e) => setCongestion(!congestion)}
             />
-            <Form.Check label={"Nausea"} onChange={(e) => setNausea(true)} />
-            <Form.Check
-              label={"Diarrhea"}
-              onChange={(e) => setDiarrhea(true)}
-            />
+            <Form.Check label={"Nausea"} onChange={(e) => setNausea(!nausea)} />
+            <Form.Group controlId="other" type="text">
+              <Form.Label>Other</Form.Label>
+              <Form.Control onChange={(e) => setOther(e.target.value)} />
+            </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -374,7 +661,9 @@ const Profile = () => {
           </Button>
           <Button
             style={{ background: "#5340b3", border: "#5340b3" }}
-            onClick={submitSymptoms}
+            onClick={() => {
+              submitSymptoms();
+            }}
           >
             Submit
           </Button>
@@ -392,9 +681,23 @@ const Profile = () => {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Control as="select">
-              <option>Negative</option>
-              <option>Positive</option>
+            <Form.Group controlId="testType" type="text">
+              <Form.Label>Test Type</Form.Label>
+              <Form.Control onChange={(e) => setTestType(e.target.value)} />
+            </Form.Group>
+            <DatePicker
+              selected={date}
+              onChange={(date) => setDate(date)}
+              dateFormat="MM/dd/yyyy"
+            />
+            <br />
+            <br />
+            <Form.Control
+              as="select"
+              onChange={(e) => setTestResult(e.target.value)}
+            >
+              <option value={"Negative"}>Negative</option>
+              <option value={"Positive"}>Positive</option>
             </Form.Control>
           </Form>
         </Modal.Body>
@@ -405,7 +708,13 @@ const Profile = () => {
           >
             Close
           </Button>
-          <Button style={{ background: "#5340b3", border: "#5340b3" }}>
+          <Button
+            style={{ background: "#5340b3", border: "#5340b3" }}
+            onClick={() => {
+              submitTestResults();
+              setShowTest(false);
+            }}
+          >
             Submit
           </Button>
         </Modal.Footer>
@@ -422,42 +731,41 @@ const Profile = () => {
           <Modal.Title>Add More Information</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            <Form.Group controlId="age">
-              <Form.Label>Age</Form.Label>
-              <Form.Control />
-            </Form.Group>
-            <br />
-            <p>Do you have any of the following:</p>
-            <li>Cancer</li>
-            <li>Chronic kidney disease</li>
-            <li>COPD (chronic obstructive pulmonary disease</li>
-            <li>Down Syndrome</li>
-            <li>
-              Heart conditions, such as heart failure, coronary artery disease,
-              or cardiomyopathies
-            </li>
-            <li>
-              Immunocompromised state (weakened immune system) from solid organ
-              transplant
-            </li>
-            <li>
-              Obesity (body mass index [BMI] of 30 kg/m<sup>2</sup> or higher
-              but &#60; 40 kg/m<sup>2</sup>)
-            </li>
-            <li>
-              Severe Obesity (BMI ≥ 40 kg/m<sup>2</sup>)
-            </li>
-            <li>Pregancy</li>
-            <li>Sickle cell disease</li>
-            <li>Smoking</li>
-            <li>Type 2 diabetes mellitus</li>
-            <br />
-            <Form.Control as="select">
-              <option>No</option>
-              <option>Yes</option>
-            </Form.Control>
-          </Form>
+          <br />
+          <p>
+            Adults of any age with certain underlying medical conditions are at
+            increased risk for severe illness. The conditions are:
+          </p>
+          <li>Cancer</li>
+          <li>Chronic kidney disease</li>
+          <li>COPD (chronic obstructive pulmonary disease</li>
+          <li>Down Syndrome</li>
+          <li>
+            Heart conditions, such as heart failure, coronary artery disease, or
+            cardiomyopathies
+          </li>
+          <li>
+            Immunocompromised state (weakened immune system) from solid organ
+            transplant
+          </li>
+          <li>
+            Obesity (body mass index [BMI] of 30 kg/m<sup>2</sup> or higher but
+            &#60; 40 kg/m<sup>2</sup>)
+          </li>
+          <li>
+            Severe Obesity (BMI ≥ 40 kg/m<sup>2</sup>)
+          </li>
+          <li>Pregancy</li>
+          <li>Sickle cell disease</li>
+          <li>Smoking</li>
+          <li>Type 2 diabetes mellitus</li>
+          <br />
+          <p>
+            Older adults are at the highest risk, and the greatest risk for
+            severe illness from COVID-19 is among those aged 85 or older.
+          </p>
+          <br />
+          <p>You can add this information in the setting page.</p>
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -466,7 +774,103 @@ const Profile = () => {
           >
             Close
           </Button>
-          <Button style={{ background: "#5340b3", border: "#5340b3" }}>
+          <Link to="/settings">
+            <Button
+              style={{ background: "#5340b3", border: "#5340b3" }}
+              style={{ background: "#5340b3", border: "#5340b3" }}
+            >
+              Go to settings
+            </Button>
+          </Link>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={editScreen}
+        onHide={() => setEditScreen(false)}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header>
+          <Modal.Title>Edit Symptom</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="temperature" type="number">
+              <Form.Label>Temperature (&#176;Fahrenheit)</Form.Label>
+              <Form.Control
+                placeholder={temperature}
+                onChange={(e) => setTemperature(e.target.value)}
+              />
+            </Form.Group>
+            <Alert show={showTempAlert} variant="danger">
+              <p>Please input a valid temperature.</p>
+            </Alert>
+            <br />
+            <p>Please select the symptoms you are experiencing.</p>
+            <Form.Check
+              label={"Cough"}
+              onChange={(e) => setCough(!cough)}
+              checked={cough}
+            />
+            <Form.Check
+              label={"Shortness of breath"}
+              onChange={(e) => setShortnessOfBreath(!shortnessOfBreath)}
+              checked={shortnessOfBreath}
+            />
+            <Form.Check
+              label={"Fatigue"}
+              onChange={(e) => setFatigue(!fatigue)}
+              checked={fatigue}
+            />
+            <Form.Check
+              label={"Muscle or body aches"}
+              onChange={(e) => setMuscleBodyAches(!muscleBodyAches)}
+              checked={muscleBodyAches}
+            />
+            <Form.Check
+              label={"Loss of taste"}
+              onChange={(e) => setLossOfTaste(!lossOfTaste)}
+              checked={lossOfTaste}
+            />
+            <Form.Check
+              label={"Sore throat"}
+              onChange={(e) => setSoreThroat(!soreThroat)}
+              checked={soreThroat}
+            />
+            <Form.Check
+              label={"Congestion or runny nose"}
+              onChange={(e) => setCongestion(!congestion)}
+              checked={congestion}
+            />
+            <Form.Check
+              label={"Nausea"}
+              onChange={(e) => setNausea(!nausea)}
+              checked={nausea}
+            />
+            <Form.Group controlId="other" type="text">
+              <Form.Label>Other</Form.Label>
+              <Form.Control
+                onChange={(e) => setOther(e.target.value)}
+                placeholder={other}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            style={{ background: "gray", border: "gray" }}
+            onClick={() => setEditScreen(false)}
+          >
+            Close
+          </Button>
+          <Button
+            style={{ background: "#5340b3", border: "#5340b3" }}
+            onClick={() => {
+              //setEditScreen(false);
+              submitEdit();
+            }}
+          >
             Submit
           </Button>
         </Modal.Footer>
