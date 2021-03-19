@@ -83,6 +83,34 @@ class Database {
         });
     }
 
+    getAllUsers() {
+        return new Promise((resolve, reject) => {
+            const connection = mysql.createConnection({
+                host: this.DB_HOST,
+                user: this.DB_USER,
+                password: this.DB_PASSWORD
+            });
+            connection.connect((err) => {
+                if (err) {
+                    connection.end();
+                    return reject(err);
+                }
+                connection.query('USE cht');
+                const selectQuery = `SELECT * FROM users WHERE admin = '0'`;
+                connection.query(selectQuery, (err, rows) => {
+                    connection.end();
+                    if (err) {
+                        return reject(err);
+                    }
+                    if (rows.length === 0) {
+                        return resolve(null);
+                    }
+                    return resolve(rows);
+                });
+            });
+        });
+    }
+
     patchUser(user, args) {
         // Build SET query based on differences in current row and arguments
         const buildArgs = (prev, next) => {

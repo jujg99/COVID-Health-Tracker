@@ -1,10 +1,12 @@
 import { Navbar, Nav, Button } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useAuth } from "../context/auth";
+import jwt from "jwt-decode";
 
 const CHTNavbar = () => {
   const { setAuthTokens } = useAuth();
   const token = getToken();
+  const admin = (token) ? jwt(localStorage.getItem("CHT-tokens")).user.admin : 0;
 
   function logOut() {
     setAuthTokens(null);
@@ -21,9 +23,19 @@ const CHTNavbar = () => {
         <Navbar.Brand href="#home">COVID Health Tracker</Navbar.Brand>
       </LinkContainer>
       <Nav className="mr-auto">
-        <LinkContainer to="/profile">
-          <Nav.Link>Profile</Nav.Link>
-        </LinkContainer>
+        {admin ? (
+          <>
+            <LinkContainer to="/admin">
+              <Nav.Link>Admin</Nav.Link>
+            </LinkContainer>
+          </>
+        ) : (
+          <>
+            <LinkContainer to="/profile">
+              <Nav.Link>Profile</Nav.Link>
+            </LinkContainer>
+          </>
+        )}
         <LinkContainer to="/#">
           <Nav.Link>Data</Nav.Link>
         </LinkContainer>

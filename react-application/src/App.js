@@ -8,6 +8,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import Testing from "./pages/Testing";
+import Users from "./pages/Users"
 import Vaccine from "./pages/Vaccine";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/auth";
@@ -44,6 +45,7 @@ function App() {
               <Vaccine />
             </Route>
             <ProtectedRoute exact path="/admin" component={Admin} admin={true} />
+            <ProtectedRoute exact path="/admin/users" component={Users} admin={true} />
             <ProtectedRoute exact path="/profile" component={Profile} />
             <ProtectedRoute exact path="/settings" component={Settings} />
             <Route path="/">
