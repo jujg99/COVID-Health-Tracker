@@ -14,7 +14,6 @@ const useFetch = url => {
   useEffect(async () => {
     const response = await fetch(url);
     const data = await response.json();
-    console.log(data);
     const arr = [];
     for (let i = 0; i < data.length; i++) {
       arr.push(createData(data[i].first_name + ' ' + data[i].last_name, data[i].username, data[i].age, data[i].atRisk, data[i].city, data[i].state));
@@ -27,7 +26,7 @@ const useFetch = url => {
 };
 
 const Admin = () => {
-  const { users, isLoading } = useFetch("http://localhost:8080/admin/");
+  const { users, isLoading } = useFetch("http://localhost:8080/admin/users");
 
   return (
     <Container fluid>

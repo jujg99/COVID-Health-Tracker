@@ -5,17 +5,14 @@ import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@material-ui/core';
 import { Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch } from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import SearchBar from "material-ui-search-bar";
 import { useLocation } from 'react-router-dom';
+import axios from "axios";
 
 const Users = () => {
     const { state } = useLocation();
-
-    const rows = [];
-    for (let i = 0; i < state.length; i++) {
-        rows.push(state[i]);
-    }
+    const [rows, setRows] = useState(state);
 
     function descendingComparator(a, b, orderBy) {
         if (b[orderBy] < a[orderBy]) {
@@ -126,7 +123,16 @@ const Users = () => {
 
     const EnhancedTableToolbar = (props) => {
         const classes = useToolbarStyles();
-        const { numSelected } = props;
+        const { numSelected, selected } = props;
+
+        const deleteUsers = () => {
+            selected.map(username => handleDelete(username));
+            const newRows = rows.filter((row) => !selected.includes(row.username));
+
+            setRows(newRows);
+            requestSearch(searched, newRows);
+            setSelected([]);
+        }
 
         return (
             <Toolbar
@@ -146,8 +152,8 @@ const Users = () => {
 
                 {numSelected > 0 &&
                     <Tooltip title="Remove User(s)">
-                        <IconButton aria-label="clear">
-                            <ClearIcon />
+                        <IconButton onClick={() => deleteUsers()}>
+                            <DeleteForeverIcon />
                         </IconButton>
                     </Tooltip>
                 }
@@ -199,19 +205,19 @@ const Users = () => {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = rows.map((n) => n.name);
+            const newSelecteds = filteredRows.map((n) => n.username);
             setSelected(newSelecteds);
             return;
         }
         setSelected([]);
     };
 
-    const handleClick = (event, name) => {
-        const selectedIndex = selected.indexOf(name);
+    const handleClick = (event, username) => {
+        const selectedIndex = selected.indexOf(username);
         let newSelected = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
+            newSelected = newSelected.concat(selected, username);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -239,34 +245,48 @@ const Users = () => {
         setDense(event.target.checked);
     };
 
-    const isSelected = (name) => selected.indexOf(name) !== -1;
-    const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+    const handleDelete = (username) => {
+        const data = {
+            username: username,
+        };
+        return axios
+            .post("http://localhost:8080/admin/delete", data)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    }
+
+    const isSelected = (username) => selected.indexOf(username) !== -1;
     const [filteredRows, setFilteredRows] = useState(rows);
+    const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
     const [searched, setSearched] = useState("");
 
-    const requestSearch = (searchedVal) => {
-        const filter = rows.filter((row) => {
+    const requestSearch = (searchedVal, rows) => {
+        setSearched(searchedVal);
+        const newRows = rows.filter((row) => {
             return row.name.toLowerCase().includes(searchedVal.toLowerCase());
         });
-        setFilteredRows(filter);
+        setFilteredRows(newRows);
     };
 
     const cancelSearch = () => {
         setSearched("");
-        requestSearch(searched);
+        requestSearch(searched, rows);
     };
 
     return (
-
         <div className={classes.root}>
             <Paper className={classes.paper}>
                 <SearchBar
                     placeholder='Search Name'
                     value={searched}
-                    onChange={(searchVal) => requestSearch(searchVal)}
+                    onChange={(searchVal) => requestSearch(searchVal, rows)}
                     onCancelSearch={() => cancelSearch()}
                 />
-                <EnhancedTableToolbar numSelected={selected.length} />
+                <EnhancedTableToolbar numSelected={selected.length} selected={selected} />
 
                 <TableContainer>
                     <Table
@@ -288,13 +308,13 @@ const Users = () => {
                             {stableSort(filteredRows, getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => {
-                                    const isItemSelected = isSelected(row.name);
+                                    const isItemSelected = isSelected(row.username);
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
                                     return (
                                         <TableRow
                                             hover
-                                            onClick={(event) => handleClick(event, row.name)}
+                                            onClick={(event) => handleClick(event, row.username)}
                                             role="checkbox"
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}

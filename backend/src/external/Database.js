@@ -111,6 +111,36 @@ class Database {
         });
     }
 
+    deleteUser(data) {
+        return new Promise((resolve, reject) => {
+            const connection = mysql.createConnection({
+                host: this.DB_HOST,
+                user: this.DB_USER,
+                password: this.DB_PASSWORD,
+                multipleStatements: true,
+            });
+            connection.connect((err) => {
+                if (err) {
+                    connection.end();
+                    return reject(err);
+                }
+                connection.query("USE cht");
+                const updateQuery = `
+                DELETE FROM symptoms WHERE username = ?;
+                DELETE FROM travels WHERE username = ?;
+                DELETE FROM tests WHERE username = ?;
+                DELETE FROM users WHERE username = ?;`;
+                connection.query(updateQuery, [data.username, data.username, data.username, data.username], (err, rows) => {
+                    connection.end();
+                    if (err) {
+                        return reject(err);
+                    }
+                    return resolve("Delete Successful");
+                });
+            });
+        });
+    }
+
     patchUser(user, args) {
         // Build SET query based on differences in current row and arguments
         const buildArgs = (prev, next) => {
