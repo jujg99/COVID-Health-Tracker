@@ -10,6 +10,7 @@ const AuthRouter = require("./routers/AuthRouter");
 const UserRouter = require("./routers/UserRouter");
 const ErrorRouter = require("./routers/ErrorRouter");
 const LocationRouter = require("./routers/LocationRouter");
+const AdminRouter = require("./routers/AdminRouter");
 const ProfileRouter = require("./routers/ProfileRouter");
 
 class CovidHealthTracker extends express {
@@ -34,6 +35,7 @@ class CovidHealthTracker extends express {
     this.use("/auth", new AuthRouter(database, configuration));
     this.use("/user", new UserRouter(database));
     this.use("/location", new LocationRouter(configuration));
+    this.use("/admin", new AdminRouter(database));
     this.use("/profile", new ProfileRouter(database));
     this.use("*", new IndexRouter());
     this.use(new ErrorRouter(configuration));

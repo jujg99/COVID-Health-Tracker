@@ -80,6 +80,34 @@ class Database {
     });
   }
 
+  getAllUsers() {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query('USE cht');
+        const selectQuery = `SELECT * FROM users WHERE admin = '0'`;
+        connection.query(selectQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          if (rows.length === 0) {
+            return resolve(null);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
   patchUser(user, args) {
     // Build SET query based on differences in current row and arguments
     const buildArgs = (prev, next) => {
@@ -228,6 +256,36 @@ class Database {
     });
   }
 
+  deleteUser(data) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+        multipleStatements: true,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const updateQuery = `
+            DELETE FROM symptoms WHERE username = ?;
+            DELETE FROM travels WHERE username = ?;
+            DELETE FROM tests WHERE username = ?;
+            DELETE FROM users WHERE username = ?;`;
+        connection.query(updateQuery, [data.username, data.username, data.username, data.username], (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve("Delete Successful");
+        });
+      });
+    });
+  }
+
   getSymptoms(username) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -307,9 +365,8 @@ class Database {
         }
         connection.query("USE cht");
         const insertQuery = `INSERT INTO tests (username, date, test, result)
-            VALUES ('${data.username}', '${data.date.substring(0, 10)}', '${
-          data.type
-        }', '${data.result}')`;
+            VALUES ('${data.username}', '${data.date.substring(0, 10)}', '${data.type
+          }', '${data.result}')`;
         connection.query(insertQuery, (err, rows) => {
           connection.end();
           if (err) {
