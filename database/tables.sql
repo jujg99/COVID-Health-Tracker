@@ -34,6 +34,7 @@ CREATE TABLE travels (
 
 CREATE TABLE symptoms (
   username varchar(50) NOT NULL,
+  id binary(16) NOT NULL,
   date date NOT NULL,
   temperature int(3),
   cough BOOLEAN,
