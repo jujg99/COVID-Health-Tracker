@@ -146,7 +146,7 @@ INSERT INTO travels (username, date, city, state)
 VALUES ('NotMacho11', '2020-02-11', 'Cambridge', 'MA');
 #7
 INSERT INTO travels (username, date, city, state)
-VALUES ('AbbyA', '2020-06-20', 'Cairo', 'EGP');
+VALUES ('AbbyA', '2020-06-20', 'Cairo', 'EG');
 #8
 INSERT INTO travels (username, date, city, state)
 VALUES ('Uther', '2020-09-15', 'Sovesty', 'RU');

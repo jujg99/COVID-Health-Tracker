@@ -10,6 +10,7 @@ import Admin from "./pages/Admin";
 import Testing from "./pages/Testing";
 import Users from "./pages/Users"
 import Vaccine from "./pages/Vaccine";
+import News from "./pages/News"
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/auth";
 
@@ -43,6 +44,9 @@ function App() {
             </Route>
             <Route exact path="/vaccine">
               <Vaccine />
+            </Route>
+            <Route exact path="/news">
+              <News />
             </Route>
             <ProtectedRoute exact path="/admin" component={Admin} admin={true} />
             <ProtectedRoute exact path="/admin/users" component={Users} admin={true} />

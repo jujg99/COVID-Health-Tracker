@@ -23,19 +23,14 @@ const CHTNavbar = () => {
         <Navbar.Brand href="#home">COVID Health Tracker</Navbar.Brand>
       </LinkContainer>
       <Nav className="mr-auto">
-        {admin ? (
-          <>
-            <LinkContainer to="/admin">
-              <Nav.Link>Admin</Nav.Link>
-            </LinkContainer>
-          </>
-        ) : (
-          <>
-            <LinkContainer to="/profile">
-              <Nav.Link>Profile</Nav.Link>
-            </LinkContainer>
-          </>
-        )}
+        {(admin === 1) &&
+          <LinkContainer to="/admin">
+            <Nav.Link>Admin</Nav.Link>
+          </LinkContainer>
+        }
+        <LinkContainer to="/profile">
+          <Nav.Link>Profile</Nav.Link>
+        </LinkContainer>
         <LinkContainer to="/#">
           <Nav.Link>Data</Nav.Link>
         </LinkContainer>
@@ -45,7 +40,7 @@ const CHTNavbar = () => {
         <LinkContainer to="/vaccine">
           <Nav.Link>Vaccine</Nav.Link>
         </LinkContainer>
-        <LinkContainer to="/#">
+        <LinkContainer to="/news">
           <Nav.Link>News</Nav.Link>
         </LinkContainer>
       </Nav>
