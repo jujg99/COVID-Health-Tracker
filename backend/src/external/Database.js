@@ -305,7 +305,6 @@ class Database {
           if (err) {
             return reject(err);
           }
-          console.log(rows);
           return resolve(rows);
         });
       });
@@ -435,6 +434,32 @@ class Database {
           if (err) {
             return reject(err);
           }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  getAgeAndRisk(username){
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const selectQuery = `SELECT age, atRisk FROM users WHERE username = '${username}'`;
+        connection.query(selectQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          console.log(rows);
           return resolve(rows);
         });
       });
