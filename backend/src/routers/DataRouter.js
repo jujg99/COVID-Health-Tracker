@@ -15,7 +15,7 @@ class DataRouter extends Router {
   static async getContinentData(req, res, next) {
     try {
       axios
-        .get("https://corona.lmao.ninja/v2/continents?yesterday=true&sort")
+        .get("https://disease.sh/v3/covid-19/continents")
         .then((response) => {
           res.send(response.data);
         });
@@ -27,7 +27,7 @@ class DataRouter extends Router {
   static async getStateData(req, res, next) {
     try {
       axios
-        .get("https://corona.lmao.ninja/v2/states?sort&yesterday=true")
+        .get("https://disease.sh/v3/covid-19/states?yesterday=true")
         .then((response) => {
             console.log(response.data);
           res.send(response.data);
