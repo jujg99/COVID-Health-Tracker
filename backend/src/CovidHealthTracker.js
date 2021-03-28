@@ -12,6 +12,7 @@ const ErrorRouter = require("./routers/ErrorRouter");
 const LocationRouter = require("./routers/LocationRouter");
 const AdminRouter = require("./routers/AdminRouter");
 const ProfileRouter = require("./routers/ProfileRouter");
+const DataRouter = require("./routers/DataRouter");
 
 class CovidHealthTracker extends express {
   constructor(database, configuration) {
@@ -37,6 +38,7 @@ class CovidHealthTracker extends express {
     this.use("/location", new LocationRouter(configuration));
     this.use("/admin", new AdminRouter(database));
     this.use("/profile", new ProfileRouter(database));
+    this.use("/data", new DataRouter());
     this.use("*", new IndexRouter());
     this.use(new ErrorRouter(configuration));
   }

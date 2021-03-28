@@ -1,4 +1,4 @@
-import { Navbar, Nav, Button } from "react-bootstrap";
+import { Navbar, Nav } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useAuth } from "../context/auth";
 import jwt from "jwt-decode";
@@ -36,7 +36,7 @@ const CHTNavbar = () => {
             </LinkContainer>
           </>
         )}
-        <LinkContainer to="/#">
+        <LinkContainer to="/data">
           <Nav.Link>Data</Nav.Link>
         </LinkContainer>
         <LinkContainer to="/testing">
