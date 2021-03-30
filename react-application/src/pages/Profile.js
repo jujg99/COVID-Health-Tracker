@@ -143,9 +143,56 @@ const Profile = () => {
   const [testResult, setTestResult] = useState("Negative");
   const [testType, setTestType] = useState("");
 
+  const [showResults, setShowResults] = useState(false);
+  const [covidResults, setCovidResults] = useState("");
+  const [severity, setSeverity] = useState("");
+
   useEffect(() => {
     getSymptoms();
   }, []);
+
+  function getResults() {
+    if (symptoms.length == 0) {
+      setCovidResults("You have no logged symptoms.");
+      return;
+    }
+    // most recent symptoms
+    var rS = symptoms[symptoms.length - 1];
+    if (
+      rS.temperature >= 100.4 ||
+      rS.cough ||
+      rS.shortBreath ||
+      rS.bodyAche ||
+      rS.congest ||
+      rS.fatigue ||
+      rS.nausea ||
+      rS.soreThroat ||
+      rS.tasteLoss
+    ) {
+      setCovidResults(
+        "Based on your most recent symptoms, you may have COVID-19. The CDC recommends that anyone with symptoms of COVID-19 should get tested. It is important to stay home and quarentine."
+      );
+      axios
+      .post("http://localhost:8080/profile/ageAndRisk", {
+        username: currentUser,
+      })
+      .then((response) => {
+        if (response.data[0].age >= 60 || response.data[0].atRisk){
+          setSeverity("Severity: You may be at an increased risk of becoming more seriously ill due to COVID-19 because of your age or medical condition. Call your medical provider, clinician advice line, or telemedicine provider.")
+        }else{
+          setSeverity("Severity: You are not at an increased risk of becoming more severely ill.");
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    } else {
+      setCovidResults(
+        "Based on your most recent symptoms, you are unlikely to have COVID-19. If you believe you may be infected, taking a COVID-19 test will give a more accurate result."
+      );
+      setSeverity("Severity: You are not at an increased risk of becoming more severely ill.");
+    }
+  }
 
   function reset() {
     setTemperature("");
@@ -165,7 +212,6 @@ const Profile = () => {
       .post("http://localhost:8080/profile/symptoms", { username: currentUser })
       .then((response) => {
         setSymptoms(response.data.symptoms);
-        console.log(response.data.symptoms);
       })
       .catch((err) => {
         console.error(err);
@@ -564,17 +610,19 @@ const Profile = () => {
           </Col>
           <Col md={8}>
             <Row className="justify-content-center">
-              <Card>
-                <Card.Body>
-                  <h4>Results:</h4>
-                  <p>
-                    <strong>Likelihood: </strong>
-                  </p>
-                  <p>
-                    <strong>Severity:</strong>
-                  </p>
-                </Card.Body>
-              </Card>
+              <Button
+                style={{
+                  background: "#5340b3",
+                  color: "white",
+                  border: "#202C42",
+                }}
+                onClick={() => {
+                  getResults();
+                  setShowResults(true);
+                }}
+              >
+                Check Results
+              </Button>
             </Row>
             <br />
             <Row className="justify-content-center">
@@ -596,6 +644,30 @@ const Profile = () => {
           </Col>
         </Row>
       </Container>
+
+      <Modal
+        show={showResults}
+        onHide={() => setShowResults(false)}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Body>
+          <p>
+            <strong>Results: {covidResults}</strong>
+          </p>
+          <p>
+            <strong>{severity}</strong>
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            style={{ background: "gray", border: "gray" }}
+            onClick={() => setShowResults(false)}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal
         show={showSymptom}
