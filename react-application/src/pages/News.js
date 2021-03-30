@@ -1,10 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Jumbotron, Image, Col } from "react-bootstrap";
-import clsx from 'clsx';
-import { lighten, makeStyles } from '@material-ui/core/styles';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel } from '@material-ui/core';
-import { Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch } from '@material-ui/core';
+import { Badge, Col, Container, Jumbotron, Media, Row } from "react-bootstrap";
 
 const useFetch = () => {
     const [news, setNews] = useState(null);
@@ -34,41 +30,129 @@ const useFetch = () => {
 
 const News = () => {
     const { news, isLoading } = useFetch();
-    /** News Fields
-     *  .author -> Article Author
-     *  .content -> Full article body
-     *  .description -> Short article summary
-     *  .source.name -> Source
-     *  .title -> Title
-     *  .url -> Article url
-     *  .urlToImage -> Article Image
-     */
+
+    const openInNewTab = (url) => {
+        const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+        if (newWindow) newWindow.opener = null
+    }
+
+    const onMouseOver = event => {
+        const el = event.target;
+        el.style.color = "#0078ff";
+        el.style.cursor = "pointer";
+        el.style.textDecoration = "underline"
+    };
+
+    const onMouseOut = event => {
+        const el = event.target;
+        el.style.color = "white";
+        el.style.textDecoration = "none"
+    };
+
     return (
         <>
             {isLoading ? <div>Loading...</div> :
-                <Paper>
+                <>
                     <Jumbotron fluid style={{ background: "#20475A" }}>
-                        <p>News Page!</p>
-                        <p>{news[0].author}</p>
+                        <Container>
+                            <Media>
+                                <img
+                                    width={500}
+                                    height={315}
+                                    className="mr-3"
+                                    src={news[0].urlToImage}
+                                    alt="Loading Image"
+                                />
+                                <Media.Body>
+                                    <span><Badge variant="info">{news[0].source.name}</Badge></span>
+                                    <h2
+                                        onMouseEnter={event => onMouseOver(event)}
+                                        onMouseOut={event => onMouseOut(event)}
+                                        onClick={() => openInNewTab(news[0].url)}
+                                        style={{ color: "white", fontWeight: "bold" }}>
+                                        {news[0].title}
+                                    </h2>
+                                    <p style={{ color: "white", fontSize: "95%" }}>{news[0].content.substring(0, 200)}</p>
+                                    <p style={{ color: "silver" }}>{news[0].publishedAt.substring(0, 10)}</p>
+                                </Media.Body>
+                            </Media>
+                        </Container>
                     </Jumbotron>
-                    <TableContainer>
-                        <Table>
-                            <TableBody>
-                                {news.map((article) => {
-                                    return (
-                                        <TableRow>
-                                            <TableCell><Image src={article.urlToImage} thumbnail /></TableCell>
-                                            <TableCell>{article.title}</TableCell>
-                                            <TableCell>{article.author}</TableCell>
-                                            <TableCell>{article.description}</TableCell>
-                                        </TableRow>
-                                    )
+                    <Container>
+                        <Row>
+                            {news.slice(1, 6).map((article) => {
+                                const onMouseOver = event => {
+                                    const el = event.target;
+                                    el.style.color = "#0078ff";
+                                    el.style.cursor = "pointer";
+                                    el.style.textDecoration = "underline"
+                                };
 
-                                })}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Paper>
+                                const onMouseOut = event => {
+                                    const el = event.target;
+                                    el.style.color = "blue";
+                                    el.style.textDecoration = "none"
+                                };
+
+                                return (
+                                    <Col>
+                                        <Media>
+                                            <Media.Body>
+                                                <img
+                                                    width={180}
+                                                    height={100}
+                                                    className="mr-3"
+                                                    src={article.urlToImage}
+                                                    alt="Loading Image"
+                                                />
+                                                <p onMouseEnter={event => onMouseOver(event)}
+                                                    onMouseOut={event => onMouseOut(event)}
+                                                    onClick={() => openInNewTab(article.url)}
+                                                    style={{ fontSize: "80%", width: "180px", color: "blue" }}>
+                                                    {article.title.substring(0, 50) + "..."}
+                                                </p>
+                                            </Media.Body>
+                                        </Media>
+                                    </Col>
+                                )
+                            })}
+                        </Row>
+                        {news.slice(6).map((article) => {
+                            const onMouseOver = event => {
+                                const el = event.target;
+                                el.style.color = "#0078ff";
+                                el.style.cursor = "pointer";
+                            };
+
+                            const onMouseOut = event => {
+                                const el = event.target;
+                                el.style.color = "#000000";
+                            };
+
+                            return (
+                                <Media style={{ paddingTop: "25px", paddingBottom: "25px" }}>
+                                    <img
+                                        width={320}
+                                        height={200}
+                                        className="mr-3"
+                                        src={article.urlToImage}
+                                        alt="Loading Image"
+                                    />
+                                    <Media.Body>
+                                        <h6><Badge variant="info">{article.source.name}</Badge></h6>
+                                        <h4
+                                            onMouseEnter={event => onMouseOver(event)}
+                                            onMouseOut={event => onMouseOut(event)}
+                                            onClick={() => openInNewTab(article.url)}>
+                                            {article.title}</h4>
+                                        <p>{article.content.substring(0, 200)}</p>
+                                        <p style={{ color: "silver" }}>{article.publishedAt.substring(0, 10)}</p>
+                                    </Media.Body>
+                                </Media>
+                            );
+                        })}
+                    </Container>
+                </>
             }
         </>
     );
