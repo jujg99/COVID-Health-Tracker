@@ -73,6 +73,7 @@ const Home = () => {
                   Find out more about testing and locations near you.
                 </Card.Text>
                 <Button
+                  href="/testing"
                   style={{
                     background: "white",
                     color: "#408cb3",
@@ -97,6 +98,7 @@ const Home = () => {
                   Read up on news about COVID-19 and the vaccine.
                 </Card.Text>
                 <Button
+                  href="/news"
                   style={{
                     background: "white",
                     color: "#408cb3",

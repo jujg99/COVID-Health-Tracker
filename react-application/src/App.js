@@ -10,6 +10,7 @@ import Admin from "./pages/Admin";
 import Testing from "./pages/Testing";
 import Users from "./pages/Users"
 import Vaccine from "./pages/Vaccine";
+import News from "./pages/News"
 import Data from "./pages/Data";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/auth";
@@ -44,6 +45,9 @@ function App() {
             </Route>
             <Route exact path="/vaccine">
               <Vaccine />
+            </Route>
+            <Route exact path="/news">
+              <News />
             </Route>
             <Route exact path="/data">
               <Data />
