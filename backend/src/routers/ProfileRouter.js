@@ -11,12 +11,14 @@ class ProfileRouter extends Router {
     this.submitTestResults = ProfileRouter.submitTestResults.bind(this);
     this.deleteSymptom = ProfileRouter.deleteSymptom.bind(this);
     this.editSymptom = ProfileRouter.editSymptom.bind(this);
+    this.getAgeAndRisk = ProfileRouter.getAgeAndRisk.bind(this);
 
     this.post("/symptoms", this.getSymptoms);
     this.post("/submitSymptoms", this.submitSymptoms);
     this.post("/submitTestResults", this.submitTestResults);
     this.post("/deleteSymptom", this.deleteSymptom);
     this.post("/editSymptom", this.editSymptom);
+    this.post("/ageAndRisk", this.getAgeAndRisk);
   }
 
   static async getSymptoms(req, res, next) {
@@ -70,6 +72,17 @@ class ProfileRouter extends Router {
       next(error);
     }
   }
+
+  static async getAgeAndRisk(req, res, next){
+    try {
+      const username = req.body.username;
+      const ret = await this.database.getAgeAndRisk(username);
+      res.send(ret);
+    } catch (error) {
+      next(error);
+    }
+  }
+  
 }
 
 module.exports = ProfileRouter;

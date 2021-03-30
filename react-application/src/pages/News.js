@@ -103,7 +103,7 @@ const News = () => {
                                                     height={100}
                                                     className="mr-3"
                                                     src={article.urlToImage}
-                                                    alt="Loading Image"
+                                                    alt="Loading Image..."
                                                 />
                                                 <p onMouseEnter={event => onMouseOver(event)}
                                                     onMouseOut={event => onMouseOut(event)}
@@ -136,7 +136,7 @@ const News = () => {
                                         height={200}
                                         className="mr-3"
                                         src={article.urlToImage}
-                                        alt="Loading Image"
+                                        alt="Loading Image..."
                                     />
                                     <Media.Body>
                                         <h6><Badge variant="info">{article.source.name}</Badge></h6>
