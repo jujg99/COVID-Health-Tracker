@@ -11,3 +11,6 @@ public/*
 
 # Misc
 *.DS_Store
+
+# Test Coverage
+coverage/
