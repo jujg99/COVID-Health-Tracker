@@ -16,6 +16,7 @@ CREATE TABLE users (
 
 CREATE TABLE tests (
   username varchar(50) NOT NULL,
+  id binary(16) NOT NULL,
   date date NOT NULL,
   test varchar(50) NOT NULL,
   result varchar(50) NOT NULL,

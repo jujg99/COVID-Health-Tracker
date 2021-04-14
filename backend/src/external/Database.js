@@ -326,46 +326,19 @@ class Database {
         connection.query("USE cht");
         const insertQuery = `INSERT INTO symptoms (username, id, date, temperature, cough, shortBreath, fatigue,
             bodyAche, tasteLoss, soreThroat, congest, nausea, other)
-            VALUES ('${symptoms.username}', 
-              UUID_TO_BIN(UUID()), 
-              curdate(), 
-              '${symptoms.temperature}', 
-              ${symptoms.cough}, 
+            VALUES ('${symptoms.username}',
+              UUID_TO_BIN(UUID()),
+              curdate(),
+              '${symptoms.temperature}',
+              ${symptoms.cough},
               ${symptoms.shortBreath},
-              ${symptoms.fatigue}, 
-              ${symptoms.bodyAche}, 
-              ${symptoms.tasteLoss}, 
-              ${symptoms.soreThroat}, 
-              ${symptoms.congestion}, 
-              ${symptoms.nausea}, 
+              ${symptoms.fatigue},
+              ${symptoms.bodyAche},
+              ${symptoms.tasteLoss},
+              ${symptoms.soreThroat},
+              ${symptoms.congestion},
+              ${symptoms.nausea},
               '${symptoms.other}')`;
-        connection.query(insertQuery, (err, rows) => {
-          connection.end();
-          if (err) {
-            return reject(err);
-          }
-          return resolve(rows);
-        });
-      });
-    });
-  }
-
-  insertTestResults(data) {
-    return new Promise((resolve, reject) => {
-      const connection = mysql.createConnection({
-        host: this.DB_HOST,
-        user: this.DB_USER,
-        password: this.DB_PASSWORD,
-      });
-      connection.connect((err) => {
-        if (err) {
-          connection.end();
-          return reject(err);
-        }
-        connection.query("USE cht");
-        const insertQuery = `INSERT INTO tests (username, date, test, result)
-            VALUES ('${data.username}', '${data.date.substring(0, 10)}', '${data.type
-          }', '${data.result}')`;
         connection.query(insertQuery, (err, rows) => {
           connection.end();
           if (err) {
@@ -417,16 +390,125 @@ class Database {
         connection.query("USE cht");
         const updateQuery = `
                     UPDATE symptoms
-                    SET temperature='${data.temperature}', 
-                      cough=${data.cough}, 
-                      shortBreath=${data.shortBreath}, 
-                      fatigue=${data.fatigue}, 
-                      bodyAche=${data.bodyAche}, 
-                      tasteLoss=${data.tasteLoss}, 
-                      soreThroat=${data.soreThroat}, 
-                      congest=${data.congestion}, 
-                      nausea=${data.nausea}, 
+                    SET temperature='${data.temperature}',
+                      cough=${data.cough},
+                      shortBreath=${data.shortBreath},
+                      fatigue=${data.fatigue},
+                      bodyAche=${data.bodyAche},
+                      tasteLoss=${data.tasteLoss},
+                      soreThroat=${data.soreThroat},
+                      congest=${data.congestion},
+                      nausea=${data.nausea},
                       other='${data.other}'
+                    WHERE id = (UUID_TO_BIN('${data.id}'))
+                `;
+        connection.query(updateQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  getTestResults(username) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const selectQuery = `SELECT BIN_TO_UUID(id) textid, tests.* FROM tests WHERE username = '${username}'`;
+        connection.query(selectQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  insertTestResults(data) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const insertQuery = `INSERT INTO tests (username, date, test, result, id)
+            VALUES ('${data.username}', '${data.date.substring(0, 10)}', '${data.type
+          }', '${data.result}', UUID_TO_BIN(UUID()))`;
+        connection.query(insertQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  deleteTestResult(data) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const deleteQuery = `DELETE FROM tests WHERE id=(UUID_TO_BIN('${data.id}'))`;
+        connection.query(deleteQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  editTestResult(data) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        console.log(data);
+        connection.query("USE cht");
+        const updateQuery = `
+                    UPDATE tests
+                    SET date='${data.date.substring(0, 10)}',
+                      test='${data.test}',
+                      result='${data.result}'
                     WHERE id = (UUID_TO_BIN('${data.id}'))
                 `;
         connection.query(updateQuery, (err, rows) => {
