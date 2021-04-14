@@ -8,16 +8,22 @@ class ProfileRouter extends Router {
 
     this.getSymptoms = ProfileRouter.getSymptoms.bind(this);
     this.submitSymptoms = ProfileRouter.submitSymptoms.bind(this);
-    this.submitTestResults = ProfileRouter.submitTestResults.bind(this);
     this.deleteSymptom = ProfileRouter.deleteSymptom.bind(this);
     this.editSymptom = ProfileRouter.editSymptom.bind(this);
+    this.getTestResults = ProfileRouter.getTestResults.bind(this);
+    this.submitTestResults = ProfileRouter.submitTestResults.bind(this);
+    this.deleteTestResult = ProfileRouter.deleteTestResult.bind(this);
+    this.editTestResult = ProfileRouter.editTestResult.bind(this);
     this.getAgeAndRisk = ProfileRouter.getAgeAndRisk.bind(this);
 
     this.post("/symptoms", this.getSymptoms);
     this.post("/submitSymptoms", this.submitSymptoms);
-    this.post("/submitTestResults", this.submitTestResults);
     this.post("/deleteSymptom", this.deleteSymptom);
     this.post("/editSymptom", this.editSymptom);
+    this.post("/tests", this.getTestResults);
+    this.post("/submitTestResults", this.submitTestResults);
+    this.post("/deleteTest", this.deleteTestResult);
+    this.post("/editTest", this.editTestResult);
     this.post("/ageAndRisk", this.getAgeAndRisk);
   }
 
@@ -37,16 +43,6 @@ class ProfileRouter extends Router {
     try {
       const input = req.body;
       const ret = await this.database.insertSymptoms(input);
-      res.send(ret);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async submitTestResults(req, res, next) {
-    try {
-      const input = req.body;
-      const ret = await this.database.insertTestResults(input);
       res.send(ret);
     } catch (error) {
       next(error);
@@ -73,6 +69,48 @@ class ProfileRouter extends Router {
     }
   }
 
+  static async getTestResults(req, res, next) {
+    try {
+      const input = req.body.username;
+      const tests = await this.database.getTestResults(input);
+      res.send({
+        tests
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async submitTestResults(req, res, next) {
+    try {
+      const input = req.body;
+      const ret = await this.database.insertTestResults(input);
+      res.send(ret);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteTestResult(req, res, next) {
+    try {
+      const input = req.body;
+      const ret = await this.database.deleteTestResult(input);
+      res.send(ret);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async editTestResult(req, res, next) {
+    try {
+      const input = req.body;
+      const ret = await this.database.editTestResult(input);
+      res.send(ret);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getAgeAndRisk(req, res, next){
     try {
       const username = req.body.username;
@@ -82,7 +120,7 @@ class ProfileRouter extends Router {
       next(error);
     }
   }
-  
+
 }
 
 module.exports = ProfileRouter;
