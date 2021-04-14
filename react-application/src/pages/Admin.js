@@ -1,7 +1,10 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Container, Card, Col } from "react-bootstrap";
+import { Container, Card, Col, Jumbotron, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import user from '../images/user.png';
+import gears from '../images/gears.png';
+import virus from '../images/virus.png';
 
 const useFetch = url => {
   const [users, setUsers] = useState(null);
@@ -26,23 +29,65 @@ const useFetch = url => {
 };
 
 const Admin = () => {
-  const { users, isLoading } = useFetch("http://localhost:8080/admin/users");
+  const { users, isLoading } = useFetch('http://localhost:8080/admin/users');
 
   return (
-    <Container fluid>
+    <>
       {isLoading ? <div>Loading...</div> :
-        <Col md={3} style={{ padding: 100 }}>
-          <Card style={{ background: "#40B3A0" }}>
-            <Card.Body>
-              <Card.Title><Link to={{
-                pathname: '/admin/users',
-                state: users,
-              }}> User List </Link></Card.Title>
-            </Card.Body>
-          </Card>
-        </Col>
+        <div style={{ backgroundColor: '#408cb3', height: '100vh' }}>
+          <Jumbotron fluid style={{ background: 'white' }}>
+            <Container>
+              <Row>
+                <Col>
+                  <Card style={{ background: 'white', width: '15rem', border: 'none' }}>
+                    <Card.Img variant="top" src={user} />
+                    <Card.Body>
+                      <Card.Title style={{textAlign: 'center'}}><h4># Users</h4></Card.Title>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col>
+                  <Card style={{ background: 'white', width: '15rem', border: 'none' }}>
+                    <Card.Img variant="top" src={gears} />
+                    <Card.Body>
+                      <Card.Title style={{textAlign: 'center'}}><h4># Admins</h4></Card.Title>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col>
+                  <Card style={{ background: 'white', width: '15rem', border: 'none' }}>
+                    <Card.Img variant="top" src={virus} />
+                    <Card.Body>
+                      <Card.Title style={{textAlign: 'center'}}><h4># At Risk</h4></Card.Title>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              </Row>
+            </Container>
+          </Jumbotron>
+          <Container>
+            <Row style={{ paddingTop: '50px' }}>
+              <Col>
+                <Card border="dark" style={{ width: '18rem', padding: '20px' }}>
+                  <Card.Body>
+                    <Link to={{ pathname: '/admin/users', state: users, }}><h5>User List</h5></Link>
+                    <Card.Text>View and manage all Covid Health Tracker users.</Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col>
+                <Card border="dark" style={{ width: '18rem', padding: '20px' }}>
+                  <Card.Body>
+                    <Link to={{ pathname: '/admin/tickets' }}><h5>Tickets</h5></Link>
+                    <Card.Text>View, manage, and respond to user tickets.</Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          </Container>
+        </div>
       }
-    </Container>
+    </>
   );
 }
 
