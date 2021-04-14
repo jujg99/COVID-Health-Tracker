@@ -4,11 +4,11 @@ describe('IndexRouter Tests', () => {
 
     const indexRouter = new IndexRouter();
 
-    test('IndexRouter should resolve correct path for a build file', () => {
+    it('should correctly resolve the build file path', () => {
         expect(indexRouter.build).toMatch(/\/backend\/public\/index.html$/);
     });
 
-    test('IndexRouter should send build file in getDefaultRoute', () => {
+    test('getDefaultRoute() should send the build file', () => {
 
         // Mock Response sendFile
         const mockRes = {};

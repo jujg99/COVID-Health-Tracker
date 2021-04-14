@@ -7,7 +7,7 @@ const Encryption = require('../../src/util/Encryption');
 
 describe('Encryption Tests', () => {
 
-    test('Encrypting with an Empty Password and Empty Salt', () => {
+    it('should encrypt an Empty Password with an Empty Salt', () => {
         const password = '';
         const salt = '';
         const expectedValue =
@@ -15,7 +15,7 @@ describe('Encryption Tests', () => {
         expect(Encryption.encrypt(password, salt)).toEqual(expectedValue);
     });
 
-    test('Encrypting with a Password and Empty Salt', () => {
+    it('should encrypt a Password with an Empty Salt', () => {
         const password = 'password';
         const salt = '';
         const expectedValue =
@@ -23,7 +23,7 @@ describe('Encryption Tests', () => {
         expect(Encryption.encrypt(password, salt)).toEqual(expectedValue);
     });
 
-    test('Encrypting with a Password and Salt', () => {
+    it('should encrypt a Password with a Salt', () => {
         const password = 'password';
         const salt = 'salt';
         const expectedValue =
