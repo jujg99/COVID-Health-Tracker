@@ -29,7 +29,6 @@ class DataRouter extends Router {
       axios
         .get("https://disease.sh/v3/covid-19/states?yesterday=true")
         .then((response) => {
-            console.log(response.data);
           res.send(response.data);
         });
     } catch (error) {
