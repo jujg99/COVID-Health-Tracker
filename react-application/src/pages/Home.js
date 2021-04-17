@@ -68,9 +68,9 @@ const Home = () => {
                 style={{ maxHeight: 260 }}
               />
               <Card.Body style={{ color: "white" }}>
-                <Card.Title>Testing</Card.Title>
+                <Card.Title>Testing and Vaccines</Card.Title>
                 <Card.Text>
-                  Find out more about testing and locations near you.
+                  Find out more about testing and vaccine locations near you.
                 </Card.Text>
                 <Button
                   href="/testing"
@@ -78,9 +78,20 @@ const Home = () => {
                     background: "white",
                     color: "#408cb3",
                     border: "#408cb3",
+                    marginRight: "10px"
                   }}
                 >
-                  Learn More
+                  Testing Locations
+                </Button>
+                <Button
+                  href="/vaccine"
+                  style={{
+                    background: "white",
+                    color: "#408cb3",
+                    border: "#408cb3",
+                  }}
+                >
+                  Vaccine Locations
                 </Button>
               </Card.Body>
             </Card>
