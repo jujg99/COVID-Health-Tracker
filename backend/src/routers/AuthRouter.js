@@ -31,14 +31,14 @@ class AuthRouter extends Router {
 
         // Serialization
         passport.serializeUser((user, done) => {
-            done(null, user.id);
+            done(null, user.username);
         });
-        passport.deserializeUser(async (id, done) => {
+        passport.deserializeUser(async (username, done) => {
             try {
-                const user = await this.database.getUser();
+                const user = await this.database.getUser(username);
                 done(null, user);
             } catch (error) {
-                done(err);
+                done(error);
             }
         });
 
@@ -49,7 +49,13 @@ class AuthRouter extends Router {
                     return done(null, false, { message: 'Username does not exist.' });
                 }
                 const user = await this.database.matchUser(username, password);
-                return done(null, user);
+                if (user === null) {
+                    const error = new Error('Unauthorized');
+                    error.status = 401;
+                    throw error;
+                } else {
+                    return done(null, user);
+                }
             } catch (error) {
                 done(error);
             }
@@ -70,7 +76,11 @@ class AuthRouter extends Router {
             jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken()
         }, (token, done) => {
             try {
-                return done(null, token.user);
+                if (token.user) {
+                    return done(null, token.user);
+                } else {
+                    throw new Error('Incomplete User Token');
+                }
             } catch (error) {
                 done(error);
             }
@@ -82,7 +92,10 @@ class AuthRouter extends Router {
             if (err) {
                 return next(err);
             }
-            if (!user) {
+            if (!user ||
+                user.id === undefined ||
+                user.username === undefined ||
+                user.admin === undefined) {
                 res.status(401);
                 return res.json(info);
             }
@@ -94,22 +107,22 @@ class AuthRouter extends Router {
 
     static handleLoginRoute(req, res, next) {
         passport.authenticate('login', (err, user, info) => {
-            try {
-                if (err || !user) {
+            if (err || !user) {
+                if (err) {
+                    return next(err);
+                } else {
                     const error = new Error('An error occurred.');
                     return next(error);
                 }
-                req.login(user, { session: false }, error => {
-                    if (error) {
-                        return next(error);
-                    }
-                    const body = { id: user.id, user: user.username, admin: user.admin };
-                    const token = jwt.sign({ user: body }, this.configuration.DB_SECRET);
-                    return res.json({ token });
-                });
-            } catch (error) {
-                return next(error);
             }
+            req.login(user, { session: false }, error => {
+                if (error) {
+                    return next(error);
+                }
+                const body = { id: user.id, user: user.username, admin: user.admin };
+                const token = jwt.sign({ user: body }, this.configuration.DB_SECRET);
+                return res.json({ token });
+            });
         })(req, res, next);
     }
 
