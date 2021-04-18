@@ -110,11 +110,11 @@ class LocationRouter extends Router {
             res.send(response);
           })
           .catch((error) => {
-            console.log(error);
+            next(error);
           });
       })
       .catch((error) => {
-        console.log(error);
+        next(error);
       });
   }
 
@@ -141,7 +141,7 @@ class LocationRouter extends Router {
         res.send(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        next(error);
       });
   }
 }

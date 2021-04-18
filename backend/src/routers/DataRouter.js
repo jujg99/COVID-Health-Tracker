@@ -13,27 +13,21 @@ class DataRouter extends Router {
   }
 
   static async getContinentData(req, res, next) {
-    try {
-      axios
-        .get("https://disease.sh/v3/covid-19/continents")
-        .then((response) => {
-          res.send(response.data);
-        });
-    } catch (error) {
-      next(error);
-    }
+    axios
+      .get("https://disease.sh/v3/covid-19/continents")
+      .then((response) => {
+        res.send(response.data);
+      })
+      .catch(error => next(error));
   }
 
   static async getStateData(req, res, next) {
-    try {
-      axios
-        .get("https://disease.sh/v3/covid-19/states?yesterday=true")
-        .then((response) => {
-          res.send(response.data);
-        });
-    } catch (error) {
-      next(error);
-    }
+    axios
+      .get("https://disease.sh/v3/covid-19/states?yesterday=true")
+      .then((response) => {
+        res.send(response.data);
+      })
+      .catch(error => next(error));
   }
 }
 
