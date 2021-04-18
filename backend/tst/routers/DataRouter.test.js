@@ -1,5 +1,5 @@
 const axios = require('axios');
-const DataRouter = require('../src/routers/DataRouter.js');
+const DataRouter = require('../../src/routers/DataRouter.js');
 
 jest.mock('axios');
 

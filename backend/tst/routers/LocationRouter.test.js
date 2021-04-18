@@ -1,10 +1,10 @@
 const axios = require("axios");
-const LocationRouter = require("../src/routers/LocationRouter.js");
+const LocationRouter = require("../../src/routers/LocationRouter.js");
 
 jest.mock("axios");
-jest.mock("../src/config/Configuration.js");
+jest.mock("../../src/config/Configuration.js");
 
-const Configuration = require("../src/config/Configuration");
+const Configuration = require("../../src/config/Configuration");
 
 describe("LocationRouter tests", () => {
   let dataRouter = null;
