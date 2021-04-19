@@ -26,24 +26,22 @@ describe('AdminRouter Tests', () => {
         test('getAllUsers() should get all users from database', async () => {
 
             // Users
-            const users = {
+            const data = {
                 users: ['users']
             };
 
             // Mock getAllUsers()
-            mockDB.getAllUsers = jest.fn().mockResolvedValueOnce(users.users);
+            mockDB.getAllUsers = jest.fn().mockResolvedValueOnce(data.users);
 
             // Mock Request
-            const mockReq = {
-
-            };
+            const mockReq = { };
 
             // Call getAllUsers()
             await adminRouter.getAllUsers(mockReq, mockRes, mockNext);
 
             expect(mockRes.json).not.toHaveBeenCalled();
             expect(mockRes.send).toHaveBeenCalledTimes(1);
-            expect(mockRes.send).toHaveBeenCalledWith(users.users);
+            expect(mockRes.send).toHaveBeenCalledWith(data.users);
             expect(mockNext).not.toHaveBeenCalled();
         });
 
@@ -68,6 +66,59 @@ describe('AdminRouter Tests', () => {
             expect(mockNext).toHaveBeenCalledTimes(1);
             expect(mockNext).toHaveBeenCalledWith(dbError);
         })
+
+    });
+
+    describe('getUserCounts() Tests', () => {
+
+        test('getUserCounts() should get the number of users, admins, and at risk users', async () => {
+
+            // Counts
+            const data = {
+                counts: ['counts']
+            };
+
+            // Mock getUserCounts()
+            mockDB.getUserCounts = jest.fn().mockResolvedValueOnce(data.counts);
+
+            // Mock Request
+            const mockReq = { };
+
+            // Call getUserCounts()
+            await adminRouter.getUserCounts(mockReq, mockRes, mockNext);
+
+            expect(mockRes.json).not.toHaveBeenCalled();
+            expect(mockRes.send).toHaveBeenCalledTimes(1);
+            expect(mockRes.send).toHaveBeenCalledWith(data.counts);
+            expect(mockNext).not.toHaveBeenCalled();
+
+        });
+
+        test('getUserCounts() should not retrieve counts with a DB error', async () => {
+
+            // Input
+            const data = {};
+
+            // DB error
+            const dbError = new Error('DB');
+
+            // Mock deleteUser()
+            mockDB.getUserCounts = jest.fn().mockRejectedValueOnce(dbError);
+
+            // Mock Request
+            const mockReq = {
+                body: data
+            };
+
+            // Call deleteUser()
+            await adminRouter.getUserCounts(mockReq, mockRes, mockNext);
+
+            expect(mockRes.json).not.toHaveBeenCalled();
+            expect(mockRes.send).not.toHaveBeenCalled();
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            expect(mockNext).toHaveBeenCalledWith(dbError);
+
+        });
 
     });
 
