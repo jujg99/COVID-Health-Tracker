@@ -549,6 +549,35 @@ class Database {
       });
     });
   }
+
+  getUserCounts() {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+        multipleStatements: true,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const selectQuery = `
+            SELECT COUNT(*) AS userCount FROM users;
+            SELECT COUNT(*) AS adminCount FROM users WHERE admin=1;
+            SELECT COUNT(*) AS atRiskCount FROM users WHERE atRisk=1;`;
+        connection.query(selectQuery, [], (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
 }
 
 module.exports = Database;
