@@ -49,7 +49,7 @@ export default class Data extends Component {
           continents: result1.data,
           states: result2.data,
         });
-        console.log(this.state.states);
+        //console.log(this.state.states);
       })
       .catch((err) => {
         console.log(err);
@@ -143,6 +143,7 @@ export default class Data extends Component {
     const dataItemStyle = {
       marginBottom: "50px",
       color: "white",
+      width: "120%",
     };
     const continentStyle = {
       fontSize: "5vw",
@@ -165,7 +166,7 @@ export default class Data extends Component {
           </Container>
           {this.state.continents.map((continent) => (
             <Container
-              style={{ position: "relative", textAlign: "center", marginBottom: "100px"}}
+              style={{ position: "relative", textAlign: "center", marginBottom: "300px"}}
               fluid
             >
               <Image
@@ -211,16 +212,24 @@ export default class Data extends Component {
                     <Row style={dataItemStyle}>
                       <Col>
                         <Row className="justify-content-center">
-                          <h2 style={dataTitleStyle}>Total Recovered:</h2>
+                          <h2 style={dataTitleStyle}>Cases per Million:</h2>
                         </Row>
                         <Row className="justify-content-center">
-                          <h3 style={dataValueStyle}>{continent.recovered}</h3>
+                          <h3 style={dataValueStyle}>{continent.casesPerOneMillion}</h3>
+                        </Row>
+                      </Col>
+                      <Col>
+                        <Row className="justify-content-center">
+                          <h2 style={dataTitleStyle}>Deaths per Million:</h2>
+                        </Row>
+                        <Row className="justify-content-center">
+                          <h3 style={dataValueStyle}>{continent.deathsPerOneMillion}</h3>
                         </Row>
                       </Col>
                     </Row>
                   </Fade>
                   <Fade bottom>
-                    <Row style={{ width: "120%" }}>
+                    <Row style={dataItemStyle}>
                       <Col>
                         <Row className="justify-content-center">
                           <h2 style={dataTitleStyle}>Today's Cases:</h2>
@@ -237,6 +246,18 @@ export default class Data extends Component {
                           <h3 style={dataValueStyle}>
                             {continent.todayDeaths}
                           </h3>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Fade>
+                  <Fade bottom>
+                    <Row style={dataItemStyle}>
+                      <Col>
+                        <Row className="justify-content-center">
+                          <h2 style={dataTitleStyle}>Total Recovered:</h2>
+                        </Row>
+                        <Row className="justify-content-center">
+                          <h3 style={dataValueStyle}>{continent.recovered}</h3>
                         </Row>
                       </Col>
                     </Row>
@@ -275,12 +296,20 @@ export default class Data extends Component {
               </Col>
             </Row>
             <Row>
-              <Col>
+            <Col>
                 <Row className="justify-content-center">
-                  <h5>Total Recovered:</h5>
+                  <h5>Cases per Million:</h5>
                 </Row>
                 <Row className="justify-content-center">
-                  <h5>{this.state.clickedState.recovered}</h5>
+                  <h5>{this.state.clickedState.casesPerOneMillion}</h5>
+                </Row>
+              </Col>
+              <Col>
+                <Row className="justify-content-center">
+                  <h5>Deaths per Million:</h5>
+                </Row>
+                <Row className="justify-content-center">
+                  <h5>{this.state.clickedState.deathsPerOneMillion}</h5>
                 </Row>
               </Col>
             </Row>
@@ -299,6 +328,16 @@ export default class Data extends Component {
                 </Row>
                 <Row className="justify-content-center">
                   <h5>{this.state.clickedState.todayDeaths}</h5>
+                </Row>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Row className="justify-content-center">
+                  <h5>Total Recovered:</h5>
+                </Row>
+                <Row className="justify-content-center">
+                  <h5>{this.state.clickedState.recovered}</h5>
                 </Row>
               </Col>
             </Row>
