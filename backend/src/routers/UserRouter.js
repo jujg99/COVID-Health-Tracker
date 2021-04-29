@@ -57,7 +57,7 @@ class UserRouter extends Router {
                 if (await this.database.getUser(req.body.username)) {
                     res.status(401);
                     return res.json({
-                        message: `User ${username} already exists`
+                        message: `User ${req.body.username} already exists`
                     });
                 }
             }

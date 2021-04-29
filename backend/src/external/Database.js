@@ -108,46 +108,46 @@ class Database {
     });
   }
 
-  patchUser(user, args) {
+  buildPatchArgs(prev, next) {
     // Build SET query based on differences in current row and arguments
-    const buildArgs = (prev, next) => {
-      try {
-        const query = [];
-        for (const key of Object.keys(prev)) {
-          // If empty input or unchangeable field
-          if (
-            prev[key] === next[key] ||
-            next[key] === "" ||
-            next[key] === null ||
-            key === "admin" ||
-            key === "id"
-          ) {
-            continue;
-          }
-          // Encrypt password
-          if (key === "password") {
-            const encrypted = Encryption.encrypt(next[key], this.SALT);
-            if (prev[key] !== encrypted) {
-              query.push(`${key} = '${encrypted}'`);
-            }
-            // Convert age
-          } else if (key === "age") {
-            query.push(`${key} = ${Number(next[key])}`);
-            // Convert atRisk
-          } else if (key === "atRisk") {
-            if ((prev[key] === 1) !== next[key]) {
-              query.push(`${key} = ${Boolean(next[key])}`);
-            }
-            // Otherwise, build
-          } else {
-            query.push(`${key} = '${next[key]}'`);
-          }
-        }
-        return query.join(", ");
-      } catch (error) {
-        return error;
+    const query = [];
+    for (const key of Object.keys(prev)) {
+      // If empty input or unchangeable field
+      if (
+        prev[key] === next[key] ||
+        next[key] === "" ||
+        next[key] === null ||
+        next[key] === undefined ||
+        key === "admin" ||
+        key === "id"
+      ) {
+        continue;
       }
-    };
+      // Encrypt password
+      if (key === "password") {
+        const encrypted = Encryption.encrypt(next[key], this.SALT);
+        if (prev[key] !== encrypted) {
+          query.push(`${key} = '${encrypted}'`);
+        }
+        // Convert age
+      } else if (key === "age") {
+        if (prev[key] !== Number(next[key])) {
+          query.push(`${key} = ${Number(next[key])}`);
+        }
+        // Convert atRisk
+      } else if (key === "atRisk") {
+        if ((prev[key] === 1) !== next[key]) {
+          query.push(`${key} = ${Boolean(next[key])}`);
+        }
+        // Otherwise, build
+      } else {
+        query.push(`${key} = '${next[key]}'`);
+      }
+    }
+    return query.join(", ");
+  }
+
+  patchUser(user, args) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
         host: this.DB_HOST,
@@ -160,12 +160,12 @@ class Database {
           return reject(err);
         }
         connection.query("USE cht");
-        const builtArgs = buildArgs(user, args);
+        const builtArgs = this.buildPatchArgs(user, args);
         if (builtArgs === "") {
+          connection.end();
           return resolve("no op");
-        } else if (builtArgs instanceof Error) {
-          return reject("Error updating profile");
         }
+
         const updateQuery = `
                     UPDATE users
                     SET ${builtArgs}
@@ -200,7 +200,7 @@ class Database {
           if (err) {
             return reject(err);
           }
-          if (rows.length !== 1) {
+          if (rows.length === 0) {
             return resolve(null);
           }
           if (rows[0].password !== Encryption.encrypt(password, this.SALT)) {
@@ -219,39 +219,43 @@ class Database {
         user: this.DB_USER,
         password: this.DB_PASSWORD,
       });
-      connection.connect(async (err) => {
+      connection.connect((err) => {
         if (err) {
           connection.end();
           return reject(err);
         }
-        try {
-          const user = await this.getUser(username);
-          if (user !== null) {
-            connection.end();
-            return resolve(null);
-          }
-          connection.query("USE cht");
-          const encryptedPassword = Encryption.encrypt(password, this.SALT);
-          connection.query(
-            this.createInsertUserQuery(username, encryptedPassword, body),
-            async (err) => {
+        return this.getUser(username)
+          .then(user => {
+            if (user !== null) {
               connection.end();
-              if (err) {
-                return reject(err);
-              }
-              const user = await this.getUser(username);
-              return resolve({
-                username,
-                password: encryptedPassword,
-                id: user.id,
-                admin: user.admin,
-              });
+              return resolve(null);
             }
-          );
-        } catch (error) {
-          connection.end();
-          return reject(error);
-        }
+            connection.query("USE cht");
+            const encryptedPassword = Encryption.encrypt(password, this.SALT);
+            connection.query(
+              this.createInsertUserQuery(username, encryptedPassword, body),
+              (err) => {
+                connection.end();
+                if (err) {
+                  return reject(err);
+                }
+                return this.getUser(username)
+                  .then(user => {
+                    return resolve({
+                      username,
+                      password: encryptedPassword,
+                      id: user.id,
+                      admin: user.admin,
+                    });
+                  })
+                  .catch(error => reject(error));
+              }
+            );
+          })
+          .catch(error => {
+            connection.end();
+            return reject(error);
+          });
       });
     });
   }
@@ -275,7 +279,7 @@ class Database {
             DELETE FROM travels WHERE username = ?;
             DELETE FROM tests WHERE username = ?;
             DELETE FROM users WHERE username = ?;`;
-        connection.query(updateQuery, [data.username, data.username, data.username, data.username], (err, rows) => {
+        connection.query(updateQuery, [data.username, data.username, data.username, data.username], (err) => {
           connection.end();
           if (err) {
             return reject(err);
@@ -326,46 +330,19 @@ class Database {
         connection.query("USE cht");
         const insertQuery = `INSERT INTO symptoms (username, id, date, temperature, cough, shortBreath, fatigue,
             bodyAche, tasteLoss, soreThroat, congest, nausea, other)
-            VALUES ('${symptoms.username}', 
-              UUID_TO_BIN(UUID()), 
-              curdate(), 
-              '${symptoms.temperature}', 
-              ${symptoms.cough}, 
+            VALUES ('${symptoms.username}',
+              UUID_TO_BIN(UUID()),
+              curdate(),
+              '${symptoms.temperature}',
+              ${symptoms.cough},
               ${symptoms.shortBreath},
-              ${symptoms.fatigue}, 
-              ${symptoms.bodyAche}, 
-              ${symptoms.tasteLoss}, 
-              ${symptoms.soreThroat}, 
-              ${symptoms.congestion}, 
-              ${symptoms.nausea}, 
+              ${symptoms.fatigue},
+              ${symptoms.bodyAche},
+              ${symptoms.tasteLoss},
+              ${symptoms.soreThroat},
+              ${symptoms.congestion},
+              ${symptoms.nausea},
               '${symptoms.other}')`;
-        connection.query(insertQuery, (err, rows) => {
-          connection.end();
-          if (err) {
-            return reject(err);
-          }
-          return resolve(rows);
-        });
-      });
-    });
-  }
-
-  insertTestResults(data) {
-    return new Promise((resolve, reject) => {
-      const connection = mysql.createConnection({
-        host: this.DB_HOST,
-        user: this.DB_USER,
-        password: this.DB_PASSWORD,
-      });
-      connection.connect((err) => {
-        if (err) {
-          connection.end();
-          return reject(err);
-        }
-        connection.query("USE cht");
-        const insertQuery = `INSERT INTO tests (username, date, test, result)
-            VALUES ('${data.username}', '${data.date.substring(0, 10)}', '${data.type
-          }', '${data.result}')`;
         connection.query(insertQuery, (err, rows) => {
           connection.end();
           if (err) {
@@ -391,12 +368,12 @@ class Database {
         }
         connection.query("USE cht");
         const deleteQuery = `DELETE FROM symptoms WHERE id=(UUID_TO_BIN('${data.id}'))`;
-        connection.query(deleteQuery, (err, rows) => {
+        connection.query(deleteQuery, (err) => {
           connection.end();
           if (err) {
             return reject(err);
           }
-          return resolve(rows);
+          return resolve('Delete Successful');
         });
       });
     });
@@ -417,15 +394,15 @@ class Database {
         connection.query("USE cht");
         const updateQuery = `
                     UPDATE symptoms
-                    SET temperature='${data.temperature}', 
-                      cough=${data.cough}, 
-                      shortBreath=${data.shortBreath}, 
-                      fatigue=${data.fatigue}, 
-                      bodyAche=${data.bodyAche}, 
-                      tasteLoss=${data.tasteLoss}, 
-                      soreThroat=${data.soreThroat}, 
-                      congest=${data.congestion}, 
-                      nausea=${data.nausea}, 
+                    SET temperature='${data.temperature}',
+                      cough=${data.cough},
+                      shortBreath=${data.shortBreath},
+                      fatigue=${data.fatigue},
+                      bodyAche=${data.bodyAche},
+                      tasteLoss=${data.tasteLoss},
+                      soreThroat=${data.soreThroat},
+                      congest=${data.congestion},
+                      nausea=${data.nausea},
                       other='${data.other}'
                     WHERE id = (UUID_TO_BIN('${data.id}'))
                 `;
@@ -440,7 +417,115 @@ class Database {
     });
   }
 
-  getAgeAndRisk(username){
+  getTestResults(username) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const selectQuery = `SELECT BIN_TO_UUID(id) textid, tests.* FROM tests WHERE username = '${username}'`;
+        connection.query(selectQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  insertTestResults(data) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const insertQuery = `INSERT INTO tests (username, date, test, result, id)
+            VALUES ('${data.username}', '${data.date.substring(0, 10)}', '${data.type
+          }', '${data.result}', UUID_TO_BIN(UUID()))`;
+        connection.query(insertQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  deleteTestResult(data) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const deleteQuery = `DELETE FROM tests WHERE id=(UUID_TO_BIN('${data.id}'))`;
+        connection.query(deleteQuery, (err) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve('Delete Successful');
+        });
+      });
+    });
+  }
+
+  editTestResult(data) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const updateQuery = `
+                    UPDATE tests
+                    SET date='${data.date.substring(0, 10)}',
+                      test='${data.test}',
+                      result='${data.result}'
+                    WHERE id = (UUID_TO_BIN('${data.id}'))
+                `;
+        connection.query(updateQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  getAgeAndRisk(username) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
         host: this.DB_HOST,
@@ -459,7 +544,6 @@ class Database {
           if (err) {
             return reject(err);
           }
-          console.log(rows);
           return resolve(rows);
         });
       });
