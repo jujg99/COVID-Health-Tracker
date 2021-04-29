@@ -278,8 +278,9 @@ class Database {
             DELETE FROM symptoms WHERE username = ?;
             DELETE FROM travels WHERE username = ?;
             DELETE FROM tests WHERE username = ?;
+            DELETE FROM tickets WHERE username = ?;
             DELETE FROM users WHERE username = ?;`;
-        connection.query(updateQuery, [data.username, data.username, data.username, data.username], (err) => {
+        connection.query(updateQuery, [data.username, data.username, data.username, data.username, data.username], (err) => {
           connection.end();
           if (err) {
             return reject(err);
