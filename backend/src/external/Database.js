@@ -626,7 +626,7 @@ class Database {
             return reject(err);
           }
           if (rows.length === 0) {
-            return resolve(null);
+            return resolve([]);
           }
           return resolve(rows);
         });
@@ -654,7 +654,7 @@ class Database {
             return reject(err);
           }
           if (rows.length === 0) {
-            return resolve(null);
+            return resolve([]);
           }
           return resolve(rows);
         });
