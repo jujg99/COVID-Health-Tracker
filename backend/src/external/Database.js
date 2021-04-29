@@ -11,6 +11,7 @@ class Database {
     this.DB_PASSWORD = configuration.DB_PASSWORD;
   }
 
+  // Template of getting a user by username
   createGetUserQuery(username) {
     return `
             SELECT
@@ -23,6 +24,7 @@ class Database {
         `;
   }
 
+  // Template of inserting a user
   createInsertUserQuery(username, encryptedPassword, body) {
     return `
             INSERT INTO users (
@@ -52,6 +54,7 @@ class Database {
         `;
   }
 
+  // Returns a user based on username
   getUser(username) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -80,6 +83,7 @@ class Database {
     });
   }
 
+  // Returns all users that are not admins
   getAllUsers() {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -99,17 +103,14 @@ class Database {
           if (err) {
             return reject(err);
           }
-          if (rows.length === 0) {
-            return resolve(null);
-          }
           return resolve(rows);
         });
       });
     });
   }
 
+  // Build SET query based on differences in current row and arguments
   buildPatchArgs(prev, next) {
-    // Build SET query based on differences in current row and arguments
     const query = [];
     for (const key of Object.keys(prev)) {
       // If empty input or unchangeable field
@@ -147,6 +148,7 @@ class Database {
     return query.join(", ");
   }
 
+  // Patches a user based on existing and new configuration
   patchUser(user, args) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -182,6 +184,7 @@ class Database {
     });
   }
 
+  // Matches password against stored user password
   matchUser(username, password) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -212,6 +215,7 @@ class Database {
     });
   }
 
+  // Insert a new user
   insertUser(username, password, body) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -260,6 +264,7 @@ class Database {
     });
   }
 
+  // Delete a user from all tables
   deleteUser(data) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -291,6 +296,7 @@ class Database {
     });
   }
 
+  // Get symptoms of a user
   getSymptoms(username) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -316,6 +322,7 @@ class Database {
     });
   }
 
+  // Insert symptoms to a user
   insertSymptoms(symptoms) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -355,6 +362,7 @@ class Database {
     });
   }
 
+  // Delete symptoms from a user based on ID
   deleteSymptom(data) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -380,6 +388,7 @@ class Database {
     });
   }
 
+  // Edit a symptom with a new configuration
   editSymptom(data) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -418,6 +427,7 @@ class Database {
     });
   }
 
+  // Get all test results of a user
   getTestResults(username) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -443,6 +453,7 @@ class Database {
     });
   }
 
+  // Insert test results for a user
   insertTestResults(data) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -470,6 +481,7 @@ class Database {
     });
   }
 
+  // Delete a test results based on ID
   deleteTestResult(data) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -495,6 +507,7 @@ class Database {
     });
   }
 
+  // Edit test results based on new configuration
   editTestResult(data) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -526,6 +539,7 @@ class Database {
     });
   }
 
+  // Get age and risk of a user
   getAgeAndRisk(username) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -551,6 +565,7 @@ class Database {
     });
   }
 
+  // Get total count metrics of users, admins, and atRisk
   getUserCounts() {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({

@@ -12,6 +12,7 @@ class DataRouter extends Router {
     this.get("/states", this.getStateData);
   }
 
+  //gets statistics for each continent
   static async getContinentData(req, res, next) {
     axios
       .get("https://disease.sh/v3/covid-19/continents")
@@ -21,6 +22,7 @@ class DataRouter extends Router {
       .catch(error => next(error));
   }
 
+  //gets statistics for each U.S. state
   static async getStateData(req, res, next) {
     axios
       .get("https://disease.sh/v3/covid-19/states?yesterday=true")

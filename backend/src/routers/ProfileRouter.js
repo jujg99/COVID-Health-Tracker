@@ -27,6 +27,7 @@ class ProfileRouter extends Router {
     this.post("/ageAndRisk", this.getAgeAndRisk);
   }
 
+  //gets all symptoms of specified user
   static async getSymptoms(req, res, next) {
     try {
       const username = req.body.username;
@@ -39,6 +40,7 @@ class ProfileRouter extends Router {
     }
   }
 
+  //insert new symptom for user
   static async submitSymptoms(req, res, next) {
     try {
       const input = req.body;
@@ -49,6 +51,7 @@ class ProfileRouter extends Router {
     }
   }
 
+  //delete specified symptom of user
   static async deleteSymptom(req, res, next) {
     try {
       const input = req.body;
@@ -59,6 +62,7 @@ class ProfileRouter extends Router {
     }
   }
 
+  //edit specified symptom of user
   static async editSymptom(req, res, next) {
     try {
       const input = req.body;
@@ -69,6 +73,7 @@ class ProfileRouter extends Router {
     }
   }
 
+  //gets test results of specified user
   static async getTestResults(req, res, next) {
     try {
       const input = req.body.username;
@@ -81,6 +86,7 @@ class ProfileRouter extends Router {
     }
   }
 
+  //insert new test result for user
   static async submitTestResults(req, res, next) {
     try {
       const input = req.body;
@@ -91,6 +97,7 @@ class ProfileRouter extends Router {
     }
   }
 
+  //delete specified test result of a user
   static async deleteTestResult(req, res, next) {
     try {
       const input = req.body;
@@ -101,6 +108,7 @@ class ProfileRouter extends Router {
     }
   }
 
+  //edit specified test result of user
   static async editTestResult(req, res, next) {
     try {
       const input = req.body;
@@ -111,6 +119,7 @@ class ProfileRouter extends Router {
     }
   }
 
+  //gets the age and atRisk of user
   static async getAgeAndRisk(req, res, next){
     try {
       const username = req.body.username;

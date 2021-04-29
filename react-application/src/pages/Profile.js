@@ -25,16 +25,16 @@ const Profile = () => {
   const currentUser = jwt(localStorage.getItem("CHT-tokens")).user.user;
 
   //modals
-  const [showSymptom, setShowSymptom] = useState(false);
-  const [showTest, setShowTest] = useState(false);
-  const [showAddInfo, setAddInfo] = useState(false);
+  const [logSymptomModal, setLogSymptomModal] = useState(false);
+  const [addTestResultModal, setAddTestResultModal] = useState(false);
+  const [addInfoModal, setAddInfoModal] = useState(false);
   const [symptomEditScreen, setSymptomEditScreen] = useState(false);
   const [testEditScreen, setTestEditScreen] = useState(false);
-  const [currentID, setCurrentID] = useState("");
+  const [showResults, setShowResults] = useState(false);
 
+  // alerts and confirmations
   const [showTempAlert, setShowTempAlert] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-
   const [currentInput, setCurrentInput] = useState(false);
 
   //symptom input
@@ -49,8 +49,24 @@ const Profile = () => {
   const [nausea, setNausea] = useState(false);
   const [other, setOther] = useState("");
 
+  //test input
+  const [date, setDate] = useState(new Date());
+  const [testResult, setTestResult] = useState("Negative");
+  const [testType, setTestType] = useState("");
+
+  const [currentID, setCurrentID] = useState("");
+
+  // list of user's logged symptoms
   const [symptoms, setSymptoms] = useState([]);
 
+  // list of user's test results
+  const [testResults, setTestResults] = useState([]);
+
+  // covid results and severity
+  const [covidResults, setCovidResults] = useState("");
+  const [severity, setSeverity] = useState("");
+
+  // set up symptom columns
   const symptomColumns = React.useMemo(
     () => [
       {
@@ -110,6 +126,7 @@ const Profile = () => {
     []
   );
 
+  //set up test columns
   const testColumns = React.useMemo(
     () => [
       {
@@ -124,11 +141,12 @@ const Profile = () => {
       {
         Header: "Result",
         accessor: "result",
-      }
+      },
     ],
     []
   );
 
+  // style for tables
   const Styles = styled.div`
     padding: 1rem;
 
@@ -158,24 +176,38 @@ const Profile = () => {
     }
   `;
 
-  //test input
-  const [date, setDate] = useState(new Date());
-  const [testResult, setTestResult] = useState("Negative");
-  const [testType, setTestType] = useState("");
-
-  const [testResults, setTestResults] = useState([]);
-
-  const [showResults, setShowResults] = useState(false);
-  const [covidResults, setCovidResults] = useState("");
-  const [severity, setSeverity] = useState("");
-
   useEffect(() => {
     getSymptoms();
     getTestResults();
   }, []);
 
+  // get symptoms of user
+  function getSymptoms() {
+    return axios
+      .post("http://localhost:8080/profile/symptoms", { username: currentUser })
+      .then((response) => {
+        setSymptoms(response.data.symptoms);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  // get test results of user
+  function getTestResults() {
+    return axios
+      .post("http://localhost:8080/profile/tests", { username: currentUser })
+      .then((response) => {
+        setTestResults(response.data.tests);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  // get covid result and severity based on most recent symptoms
   function getResults() {
-    if (symptoms.length == 0) {
+    if (symptoms.length === 0) {
       setCovidResults("You have no logged symptoms.");
       return;
     }
@@ -192,18 +224,25 @@ const Profile = () => {
       rS.soreThroat ||
       rS.tasteLoss
     ) {
+      // if user has any symptoms, they may have covid
       setCovidResults(
         "Based on your most recent symptoms, you may have COVID-19. The CDC recommends that anyone with symptoms of COVID-19 should get tested. It is important to stay home and quarentine."
       );
+
+      // now find severity
       axios
         .post("http://localhost:8080/profile/ageAndRisk", {
           username: currentUser,
         })
         .then((response) => {
           if (response.data[0].age >= 60 || response.data[0].atRisk) {
-            setSeverity("Severity: You may be at an increased risk of becoming more seriously ill due to COVID-19 because of your age or medical condition. Call your medical provider, clinician advice line, or telemedicine provider.");
+            setSeverity(
+              "Severity: You may be at an increased risk of becoming more seriously ill due to COVID-19 because of your age or medical condition. Call your medical provider, clinician advice line, or telemedicine provider."
+            );
           } else {
-            setSeverity("Severity: You are not at an increased risk of becoming more severely ill.");
+            setSeverity(
+              "Severity: You are not at an increased risk of becoming more severely ill."
+            );
           }
         })
         .catch((err) => {
@@ -213,10 +252,13 @@ const Profile = () => {
       setCovidResults(
         "Based on your most recent symptoms, you are unlikely to have COVID-19. If you believe you may be infected, taking a COVID-19 test will give a more accurate result."
       );
-      setSeverity("Severity: You are not at an increased risk of becoming more severely ill.");
+      setSeverity(
+        "Severity: You are not at an increased risk of becoming more severely ill."
+      );
     }
   }
 
+  // reset inputs for symptom and test result logging
   function reset() {
     setTemperature("");
     setCough(false);
@@ -233,22 +275,13 @@ const Profile = () => {
     setTestResult("Negative");
   }
 
-  function getSymptoms() {
-    return axios
-      .post("http://localhost:8080/profile/symptoms", { username: currentUser })
-      .then((response) => {
-        setSymptoms(response.data.symptoms);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-
   function submitSymptoms() {
-    if (temperature.length == 0 || isNaN(temperature)) {
+    if (temperature.length === 0 || isNaN(temperature)) {
+      // check if temperature input is valid
       setShowTempAlert(true);
       return;
     }
+    //data to be sent to backend
     const data = {
       username: currentUser,
       temperature: temperature,
@@ -265,22 +298,11 @@ const Profile = () => {
     return axios
       .post("http://localhost:8080/profile/submitSymptoms", data)
       .then((response) => {
-        getSymptoms();
+        getSymptoms(); //update symptom table again with new input
         setCurrentInput("Your symptoms have been successfully submitted.");
-        setShowConfirmation(true);
-        setShowSymptom(false);
-        reset();
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-
-  function getTestResults() {
-    return axios
-      .post("http://localhost:8080/profile/tests", { username: currentUser })
-      .then((response) => {
-        setTestResults(response.data.tests);
+        setShowConfirmation(true); // show confirmation
+        setLogSymptomModal(false); //close log symptom modal
+        reset(); // clear input
       })
       .catch((err) => {
         console.error(err);
@@ -288,6 +310,7 @@ const Profile = () => {
   }
 
   function submitTestResults() {
+    //data to be sent to backend
     const data = {
       username: currentUser,
       date: date,
@@ -297,17 +320,18 @@ const Profile = () => {
     return axios
       .post("http://localhost:8080/profile/submitTestResults", data)
       .then((response) => {
-        getTestResults();
+        getTestResults(); //update test result table
         setDate(new Date());
         setCurrentInput("Your test results have been successfully submitted.");
-        setShowConfirmation(true);
-        reset();
+        setShowConfirmation(true); // show confirmation
+        reset(); //clear input
       })
       .catch((err) => {
         console.error(err);
       });
   }
 
+  // set up checkbox for tables
   const IndeterminateCheckbox = React.forwardRef(
     ({ indeterminate, ...rest }, ref) => {
       const defaultRef = React.useRef();
@@ -334,7 +358,6 @@ const Profile = () => {
       rows,
       prepareRow,
       selectedFlatRows,
-      state: { selectedRowIds },
     } = useTable(
       {
         columns,
@@ -424,7 +447,7 @@ const Profile = () => {
   }
 
   function editRow(selectedRow) {
-    if (selectedRow.length == 0) {
+    if (selectedRow.length === 0) {
       return;
     }
     if (selectedRow[0].original.test === undefined) {
@@ -441,7 +464,6 @@ const Profile = () => {
       setCurrentID(selectedRow[0].original.textid);
       setSymptomEditScreen(true);
     } else {
-      console.log(selectedRow[0].original);
       setTestType(selectedRow[0].original.test);
       setDate(new Date(selectedRow[0].original.date));
       setTestResult(selectedRow[0].original.result);
@@ -451,6 +473,7 @@ const Profile = () => {
   }
 
   function submitSymptomEdit() {
+    // data to be sent to backend
     const data = {
       id: currentID,
       temperature: temperature,
@@ -467,11 +490,11 @@ const Profile = () => {
     return axios
       .post("http://localhost:8080/profile/editSymptom", data)
       .then((response) => {
-        getSymptoms();
-        setSymptomEditScreen(false);
+        getSymptoms(); //update symptom table
+        setSymptomEditScreen(false); // close edit screen
         setCurrentInput("The row has been successfully edited.");
-        setShowConfirmation(true);
-        reset();
+        setShowConfirmation(true); // show confirmation
+        reset(); //reset input
       })
       .catch((err) => {
         console.error(err);
@@ -479,6 +502,7 @@ const Profile = () => {
   }
 
   function submitTestEdit() {
+    //data to be sent to backend
     const data = {
       id: currentID,
       date: date,
@@ -488,11 +512,11 @@ const Profile = () => {
     return axios
       .post("http://localhost:8080/profile/editTest", data)
       .then((response) => {
-        getTestResults();
-        setTestEditScreen(false);
+        getTestResults(); //update test result table
+        setTestEditScreen(false); //close test edit screen
         setCurrentInput("The row has been successfully edited.");
-        setShowConfirmation(true);
-        reset();
+        setShowConfirmation(true); //show confirmation
+        reset();  //reset input
       })
       .catch((err) => {
         console.error(err);
@@ -500,10 +524,11 @@ const Profile = () => {
   }
 
   function deleteRow(selectedRow) {
-    if (selectedRow.length == 0) {
+    if (selectedRow.length === 0) {
       return;
     }
     if (selectedRow[0].original.test === undefined) {
+      // id of symptom to be sent to backend
       const data = {
         id: symptoms[selectedRow[0].index].textid,
       };
@@ -518,6 +543,7 @@ const Profile = () => {
           console.error(err);
         });
     } else {
+      // id of test result to be sent to backend
       const data = {
         id: testResults[selectedRow[0].index].textid,
       };
@@ -576,7 +602,7 @@ const Profile = () => {
                         color: "white",
                         border: "#202C42",
                       }}
-                      onClick={() => setShowSymptom(true)}
+                      onClick={() => setLogSymptomModal(true)}
                     >
                       Log Symptoms
                     </Button>
@@ -626,7 +652,7 @@ const Profile = () => {
                         color: "white",
                         border: "#202C42",
                       }}
-                      onClick={() => setShowTest(true)}
+                      onClick={() => setAddTestResultModal(true)}
                     >
                       Add Test Results
                     </Button>
@@ -666,7 +692,7 @@ const Profile = () => {
                         color: "white",
                         border: "#202C42",
                       }}
-                      onClick={() => setAddInfo(true)}
+                      onClick={() => setAddInfoModal(true)}
                     >
                       Add More Information
                     </Button>
@@ -735,6 +761,7 @@ const Profile = () => {
         </Row>
       </Container>
 
+      {/* Modals */}
       <Modal
         show={showResults}
         onHide={() => setShowResults(false)}
@@ -760,8 +787,8 @@ const Profile = () => {
       </Modal>
 
       <Modal
-        show={showSymptom}
-        onHide={() => setShowSymptom(false)}
+        show={logSymptomModal}
+        onHide={() => setLogSymptomModal(false)}
         backdrop="static"
         keyboard={false}
       >
@@ -815,7 +842,7 @@ const Profile = () => {
           <Button
             style={{ background: "gray", border: "gray" }}
             onClick={() => {
-              setShowSymptom(false);
+              setLogSymptomModal(false);
               setShowTempAlert(false);
             }}
           >
@@ -833,8 +860,8 @@ const Profile = () => {
       </Modal>
 
       <Modal
-        show={showTest}
-        onHide={() => setShowTest(false)}
+        show={addTestResultModal}
+        onHide={() => setAddTestResultModal(false)}
         backdrop="static"
         keyboard={false}
       >
@@ -867,7 +894,7 @@ const Profile = () => {
         <Modal.Footer>
           <Button
             style={{ background: "gray", border: "gray" }}
-            onClick={() => setShowTest(false)}
+            onClick={() => setAddTestResultModal(false)}
           >
             Close
           </Button>
@@ -875,7 +902,7 @@ const Profile = () => {
             style={{ background: "#5340b3", border: "#5340b3" }}
             onClick={() => {
               submitTestResults();
-              setShowTest(false);
+              setAddTestResultModal(false);
             }}
           >
             Submit
@@ -885,8 +912,8 @@ const Profile = () => {
 
       <Modal
         size="lg"
-        show={showAddInfo}
-        onHide={() => setAddInfo(false)}
+        show={addInfoModal}
+        onHide={() => setAddInfoModal(false)}
         backdrop="static"
         keyboard={false}
       >
@@ -933,13 +960,12 @@ const Profile = () => {
         <Modal.Footer>
           <Button
             style={{ background: "gray", border: "gray" }}
-            onClick={() => setAddInfo(false)}
+            onClick={() => setAddInfoModal(false)}
           >
             Close
           </Button>
           <Link to="/settings">
             <Button
-              style={{ background: "#5340b3", border: "#5340b3" }}
               style={{ background: "#5340b3", border: "#5340b3" }}
             >
               Go to settings
@@ -1030,7 +1056,6 @@ const Profile = () => {
           <Button
             style={{ background: "#5340b3", border: "#5340b3" }}
             onClick={() => {
-              //setEditScreen(false);
               submitSymptomEdit();
             }}
           >
@@ -1054,7 +1079,8 @@ const Profile = () => {
               <Form.Label>Test Type</Form.Label>
               <Form.Control
                 placeholder={testType}
-                onChange={(e) => setTestType(e.target.value)} />
+                onChange={(e) => setTestType(e.target.value)}
+              />
             </Form.Group>
             <DatePicker
               selected={date}
@@ -1083,7 +1109,6 @@ const Profile = () => {
           <Button
             style={{ background: "#5340b3", border: "#5340b3" }}
             onClick={() => {
-              //setEditScreen(false);
               submitTestEdit();
             }}
           >
