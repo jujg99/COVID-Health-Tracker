@@ -32,6 +32,7 @@ const Tickets = () => {
       setResponse('');
 
       const ticket = pendingTickets[index];
+      ticket.answer = response;
       const data = {
         answer: response,
         username: ticket.username,
