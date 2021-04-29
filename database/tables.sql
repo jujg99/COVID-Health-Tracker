@@ -51,3 +51,13 @@ CREATE TABLE symptoms (
   CONSTRAINT usernameSymptoms FOREIGN KEY (username) REFERENCES users (username)
 );
 
+CREATE TABLE tickets (
+  username varchar(50) NOT NULL,
+  ticket_id binary(16) NOT NULL,
+  date date NOT NULL,
+  answered BOOLEAN,
+  question varchar(300) NOT NULL,
+  answer varchar(300),
+  KEY usernameTickets_idx (username),
+  CONSTRAINT usernameTickets FOREIGN KEY (username) REFERENCES users (username)
+);

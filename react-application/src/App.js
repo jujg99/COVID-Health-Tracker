@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import Help from "./pages/Help";
 import Admin from "./pages/Admin";
 import Testing from "./pages/Testing";
 import Users from "./pages/Users"
@@ -58,6 +59,7 @@ function App() {
             <ProtectedRoute exact path="/admin/tickets" component={Tickets} admin={true} />
             <ProtectedRoute exact path="/profile" component={Profile} />
             <ProtectedRoute exact path="/settings" component={Settings} />
+            <ProtectedRoute exact path="/help" component={Help} />
             <Route path="/">
               <Home />
             </Route>

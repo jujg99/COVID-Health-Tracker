@@ -47,6 +47,9 @@ const CHTNavbar = () => {
       <Nav>
         {token ? (
           <>
+            <LinkContainer to="/help">
+              <Nav.Link>Help</Nav.Link>
+            </LinkContainer>
             <LinkContainer to="/settings">
               <Nav.Link>Settings</Nav.Link>
             </LinkContainer>
