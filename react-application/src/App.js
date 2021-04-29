@@ -12,6 +12,7 @@ import Users from "./pages/Users"
 import Vaccine from "./pages/Vaccine";
 import News from "./pages/News"
 import Data from "./pages/Data";
+import Tickets from "./pages/Tickets";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/auth";
 
@@ -54,6 +55,7 @@ function App() {
             </Route>
             <ProtectedRoute exact path="/admin" component={Admin} admin={true} />
             <ProtectedRoute exact path="/admin/users" component={Users} admin={true} />
+            <ProtectedRoute exact path="/admin/tickets" component={Tickets} admin={true} />
             <ProtectedRoute exact path="/profile" component={Profile} />
             <ProtectedRoute exact path="/settings" component={Settings} />
             <Route path="/">

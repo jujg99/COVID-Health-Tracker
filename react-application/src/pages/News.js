@@ -16,12 +16,22 @@ const useFetch = () => {
         return date;
     }
 
+    function filterArticles(articles) {
+        const seen = new Set();
+        const filtered = articles.filter(article => {
+            const duplicate = seen.has(article.title);
+            seen.add(article.title);
+            return !duplicate;
+        })
+        return filtered;
+    }
+
     useEffect(async () => {
         const response = await fetch(url, {
             "method": "GET",
         });
         const data = await response.json();
-        setNews(data.articles);
+        setNews(filterArticles(data.articles));
         setLoading(false);
     }, []);
 
@@ -95,7 +105,7 @@ const News = () => {
                                 };
 
                                 return (
-                                    <Col>
+                                    <Col key={ Math.random().toString(36).substr(2, 9) }>
                                         <Media>
                                             <Media.Body>
                                                 <img
@@ -130,7 +140,7 @@ const News = () => {
                             };
 
                             return (
-                                <Media style={{ paddingTop: "25px", paddingBottom: "25px" }}>
+                                <Media key={ Math.random().toString(36).substr(2, 9) } style={{ paddingTop: "25px", paddingBottom: "25px" }}>
                                     <img
                                         width={320}
                                         height={200}
