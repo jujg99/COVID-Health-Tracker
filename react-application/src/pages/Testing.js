@@ -39,25 +39,23 @@ export class Testing extends Component {
 
   findNearby = () => {
     navigator.permissions.query({ name: "geolocation" }).then((result) => {
-      if (result.state == "denied") {
+      if (result.state === "denied") { // show alert if location permissions is off
         this.setState({
           showAlert: true,
         });
         return;
+      } else {
+        const pos = this.state.currentPosition;
+        return axios
+          .post("http://localhost:8080/location/testing", pos) // get testing locations
+          .then((response) => {
+            this.setState({ places: response.data.results });
+          })
+          .catch((err) => {
+            console.error(err);
+          });
       }
     });
-
-    const pos = this.state.currentPosition;
-
-    return axios
-      .post("http://localhost:8080/location/testing", pos)
-      .then((response) => {
-        this.setState({ places: response.data.results });
-        console.log(this.state.places);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
   };
 
   onMarkerClick = (props, marker, e) => {

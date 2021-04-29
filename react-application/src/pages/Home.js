@@ -13,7 +13,7 @@ const Home = () => {
           <p>
             As a central hub for COVID-19 data, keep up with important news and
             statistics about the virus and vaccine while tracking your symptoms.
-            Update your test results and learn more about contact tracing.
+            Update your test results and find testing and vaccine locations near you.
           </p>
           <Button
             href="/signup"

@@ -31,6 +31,8 @@ export default class Data extends Component {
       clickedState: {},
       stateModal: false,
     };
+
+    // give each continent their continent image
     this.state.images.set("North America", northAmerica);
     this.state.images.set("South America", southAmerica);
     this.state.images.set("Europe", europe);
@@ -41,21 +43,21 @@ export default class Data extends Component {
 
   componentDidMount() {
     Promise.all([
-      axios.get("http://localhost:8080/data/continents"),
-      axios.get("http://localhost:8080/data/states"),
+      axios.get("http://localhost:8080/data/continents"), // get data for continents
+      axios.get("http://localhost:8080/data/states"), // get data for states
     ])
       .then(([result1, result2]) => {
         this.setState({
           continents: result1.data,
           states: result2.data,
         });
-        //console.log(this.state.states);
       })
       .catch((err) => {
         console.log(err);
       });
   }
 
+  // handles clicks on the U.S. map
   mapHandler = (event) => {
     const stateList = {
       AZ: "Arizona",
@@ -118,9 +120,10 @@ export default class Data extends Component {
       DC: "District Of Columbia",
     };
     var abbr = event.target.dataset.name;
-    console.log(abbr);
     var stateName = stateList[abbr];
     var stateData = {};
+
+    // find data for selected state and displays it in stateModal
     this.state.states.forEach(function (item, index) {
       if (item.state === stateName) {
         stateData = item;
@@ -159,11 +162,15 @@ export default class Data extends Component {
             background: "#408cb3",
           }}
         >
+
+          {/* U.S. state map */}
           <Container style={{ color: "white", marginBottom: "200px", marginTop: "100px"}}>
             <Row className="justify-content-center">
               <USAMap onClick={this.mapHandler} />
             </Row>
           </Container>
+
+          {/* continent data */}
           {this.state.continents.map((continent) => (
             <Container
               style={{ position: "relative", textAlign: "center", marginBottom: "300px"}}
@@ -267,6 +274,8 @@ export default class Data extends Component {
             </Container>
           ))}
         </Jumbotron>
+
+        {/* state data modal */}
         <Modal
           show={this.state.stateModal}
           onHide={() => this.setState({ stateModal: false })}

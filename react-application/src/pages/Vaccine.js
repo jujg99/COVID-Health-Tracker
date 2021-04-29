@@ -12,7 +12,6 @@ import {
 import axios from "axios";
 
 //https://www.vaccinespotter.org/api/
-//https://github.com/GUI/covid-vaccine-spotter
 
 export default class Vaccine extends Component {
   constructor(props) {
@@ -27,7 +26,7 @@ export default class Vaccine extends Component {
   }
 
   findVaccine = () => {
-    console.log(/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(this.state.zip));
+    //check that zip matches the format for a zipcode
     if (!/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(this.state.zip)) {
       this.setState({
         noZipAlert: true,
@@ -39,11 +38,13 @@ export default class Vaccine extends Component {
       noMatchAlert: false,
     });
 
+    //data to be sent to backend
     const data = { zip: this.state.zip, distance: this.state.distance };
     axios
       .post("http://localhost:8080/location/vaccine", data)
       .then((response) => {
-        if (response.data == "No match") {
+        if (response.data === "No match") {
+          //no vaccine locations
           this.setState({
             noMatchAlert: true,
             locations: [],

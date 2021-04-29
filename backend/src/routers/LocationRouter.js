@@ -19,6 +19,7 @@ class LocationRouter extends Router {
     this.post("/vaccine", this.getVaccineLocations);
   }
 
+  //find distance between two locations in miles, returns true/false if distance is less than specified distance
   static getDistanceFromLatLonInMiles(lat1, lon1, lat2, lon2, dist) {
     var R = 3958.8; // Radius of the earth in miles
     var dLat = this.deg2rad(lat2 - lat1);
@@ -55,9 +56,10 @@ class LocationRouter extends Router {
         var found = true;
         response.data.results[0].address_components.forEach(function (item) {
           if (item.types[0] == "administrative_area_level_1") {
-            s = item.short_name;
+            s = item.short_name; //state
           }
           if (item.types[0] == "postal_code") {
+            //if postal code google returns doesn't match ours, then the zip code doesn't exist
             if (zipCode != item.long_name) {
               found = false;
               return;
@@ -66,6 +68,7 @@ class LocationRouter extends Router {
         });
 
         if (!found) {
+          //the zip code didn't exist
           res.send("No match");
           return;
         }
@@ -90,6 +93,7 @@ class LocationRouter extends Router {
               const validPlaces = [];
               response.forEach(
                 function (item, index) {
+                  //keep the locations that are within our specified distance
                   if (
                     this.getDistanceFromLatLonInMiles(
                       item.geometry.coordinates[1],
@@ -119,14 +123,13 @@ class LocationRouter extends Router {
   }
 
   static handleTestingRoute(req, res, next) {
-    const axios = require("axios");
-
     const latitude = req.body.lat;
     const longitude = req.body.lng;
 
     const location = latitude + "," + longitude;
     const query = "covid+testing";
     const key = this.configuration.GOOGLE_API;
+    // find testing locations based on latitude and longitude
     axios
       .get(
         "https://maps.googleapis.com/maps/api/place/textsearch/json?location=" +
