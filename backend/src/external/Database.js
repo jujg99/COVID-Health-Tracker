@@ -637,7 +637,7 @@ class Database {
             '',
             UUID_TO_BIN(UUID())
           )`;
-        connection.query(insertQuery, [], (err, rows) => {
+        connection.query(insertQuery, (err, rows) => {
           connection.end();
           if (err) {
             return reject(err);
