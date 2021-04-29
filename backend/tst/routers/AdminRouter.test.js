@@ -179,7 +179,7 @@ describe('AdminRouter Tests', () => {
 
         test('getPendingTickets() should get all unanswered tickets from database', async () => {
 
-            // Users
+            // Data
             const data = {
                 tickets: ['tickets']
             };
@@ -195,7 +195,7 @@ describe('AdminRouter Tests', () => {
 
             expect(mockRes.json).not.toHaveBeenCalled();
             expect(mockRes.send).toHaveBeenCalledTimes(1);
-            expect(mockRes.send).toHaveBeenCalledWith(data.users);
+            expect(mockRes.send).toHaveBeenCalledWith(data.tickets);
             expect(mockNext).not.toHaveBeenCalled();
         });
 
@@ -227,7 +227,7 @@ describe('AdminRouter Tests', () => {
 
         test('getAnsweredTickets() should get all answered tickets from database', async () => {
 
-            // Users
+            // Data
             const data = {
                 tickets: ['tickets']
             };
@@ -243,7 +243,7 @@ describe('AdminRouter Tests', () => {
 
             expect(mockRes.json).not.toHaveBeenCalled();
             expect(mockRes.send).toHaveBeenCalledTimes(1);
-            expect(mockRes.send).toHaveBeenCalledWith(data.users);
+            expect(mockRes.send).toHaveBeenCalledWith(data.tickets);
             expect(mockNext).not.toHaveBeenCalled();
         });
 
