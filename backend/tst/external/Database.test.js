@@ -395,7 +395,7 @@ describe('Database Tests', () => {
             expect(mockConnection.connect).toHaveBeenCalledTimes(1);
             expect(mockConnection.end).toHaveBeenCalledTimes(1);
             expect(mockConnection.query).toHaveBeenCalledTimes(2);
-            await expect(promise).resolves.toEqual(null);
+            await expect(promise).resolves.toEqual([]);
 
         });
 
