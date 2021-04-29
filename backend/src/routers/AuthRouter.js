@@ -45,15 +45,19 @@ class AuthRouter extends Router {
         // Strategies
         passport.use('login', new LocalStrategy(async (username, password, done) => {
             try {
+                // If user doesn't exist, return error
                 if (!(await this.database.getUser(username))) {
                     return done(null, false, { message: 'Username does not exist.' });
                 }
                 const user = await this.database.matchUser(username, password);
+                // If password doesn't match, return 401
                 if (user === null) {
                     const error = new Error('Unauthorized');
                     error.status = 401;
                     throw error;
-                } else {
+                }
+                // Else, return the user
+                else {
                     return done(null, user);
                 }
             } catch (error) {
@@ -62,9 +66,11 @@ class AuthRouter extends Router {
         }));
         passport.use('signup', new LocalStrategy({ passReqToCallback: true }, async (req, username, password, done) => {
             try {
+                // If the username is already taken, return an error
                 if (await this.database.getUser(username)) {
                     return done(null, false, { message: 'Username is already taken.' });
                 }
+                // Insert then new user
                 const newUser = await this.database.insertUser(username, password, req.body);
                 return done(null, newUser);
             } catch (error) {
@@ -89,9 +95,11 @@ class AuthRouter extends Router {
 
     static handleSignUpRoute(req, res, next) {
         passport.authenticate('signup', { session: false }, (err, user, info) => {
+            // If error, return error
             if (err) {
                 return next(err);
             }
+            // If user is invalid, return 401
             if (!user ||
                 user.id === undefined ||
                 user.username === undefined ||
@@ -99,6 +107,7 @@ class AuthRouter extends Router {
                 res.status(401);
                 return res.json(info);
             }
+            // Return token from user
             const body = { id: user.id, user: user.username, admin: user.admin };
             const token = jwt.sign({ user: body }, this.configuration.DB_SECRET);
             return res.json({ token });
@@ -107,6 +116,7 @@ class AuthRouter extends Router {
 
     static handleLoginRoute(req, res, next) {
         passport.authenticate('login', (err, user, info) => {
+            // If error or invalid user, return error
             if (err || !user) {
                 if (err) {
                     return next(err);
@@ -116,9 +126,11 @@ class AuthRouter extends Router {
                 }
             }
             req.login(user, { session: false }, error => {
+                // If error, return error
                 if (error) {
                     return next(error);
                 }
+                // Return token from user
                 const body = { id: user.id, user: user.username, admin: user.admin };
                 const token = jwt.sign({ user: body }, this.configuration.DB_SECRET);
                 return res.json({ token });
