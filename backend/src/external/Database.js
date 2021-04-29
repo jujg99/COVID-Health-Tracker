@@ -578,6 +578,76 @@ class Database {
       });
     });
   }
+
+  getTickets(username) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+        multipleStatements: true,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const selectQuery =
+          `SELECT * FROM tickets WHERE username = '${username}';`;
+        connection.query(selectQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  insertTicket(username, question) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+        multipleStatements: true,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const insertQuery = `
+          INSERT INTO tickets (
+            username,
+            date,
+            answered,
+            question,
+            answer,
+            ticket_id
+          )
+          VALUES (
+            '${username}',
+            curdate(),
+            false,
+            '${question}',
+            '',
+            UUID_TO_BIN(UUID())
+          )`;
+        connection.query(insertQuery, [], (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
 }
 
 module.exports = Database;
