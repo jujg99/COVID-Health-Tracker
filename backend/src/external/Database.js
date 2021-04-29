@@ -578,6 +578,89 @@ class Database {
       });
     });
   }
+
+  getPendingTickets() {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query('USE cht');
+        const selectQuery = `SELECT * FROM tickets WHERE answered = '0'`;
+        connection.query(selectQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          if (rows.length === 0) {
+            return resolve(null);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  getAnsweredTickets() {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query('USE cht');
+        const selectQuery = `SELECT * FROM tickets WHERE answered = '1'`;
+        connection.query(selectQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          if (rows.length === 0) {
+            return resolve(null);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  updateTicket(data) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+        multipleStatements: true,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const updateQuery = `UPDATE tickets SET answer=?, answered=1 WHERE username=? AND question=?;`;
+        connection.query(updateQuery, [data.answer, data.username, data.question], (err) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve("Update Successful");
+        });
+      });
+    });
+  }
+
 }
 
 module.exports = Database;

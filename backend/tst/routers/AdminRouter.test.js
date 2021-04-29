@@ -50,7 +50,7 @@ describe('AdminRouter Tests', () => {
             // DB error
             const dbError = new Error('DB');
 
-            // Mock getSymptoms()
+            // Mock getAllUsers()
             mockDB.getAllUsers = jest.fn().mockRejectedValueOnce(dbError);
 
             // Mock Request
@@ -165,6 +165,155 @@ describe('AdminRouter Tests', () => {
 
             // Call deleteUser()
             await adminRouter.deleteUser(mockReq, mockRes, mockNext);
+
+            expect(mockRes.json).not.toHaveBeenCalled();
+            expect(mockRes.send).not.toHaveBeenCalled();
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            expect(mockNext).toHaveBeenCalledWith(dbError);
+
+        });
+
+    });
+
+    describe('getPendingTickets() Tests', () => {
+
+        test('getPendingTickets() should get all unanswered tickets from database', async () => {
+
+            // Users
+            const data = {
+                tickets: ['tickets']
+            };
+
+            // Mock getPendingTickets()
+            mockDB.getPendingTickets = jest.fn().mockResolvedValueOnce(data.tickets);
+
+            // Mock Request
+            const mockReq = { };
+
+            // Call getPendingTickets()
+            await adminRouter.getPendingTickets(mockReq, mockRes, mockNext);
+
+            expect(mockRes.json).not.toHaveBeenCalled();
+            expect(mockRes.send).toHaveBeenCalledTimes(1);
+            expect(mockRes.send).toHaveBeenCalledWith(data.users);
+            expect(mockNext).not.toHaveBeenCalled();
+        });
+
+        test('getPendingTickets() should not get pending tickets with a DB error', async () => {
+
+            // DB error
+            const dbError = new Error('DB');
+
+            // Mock getPendingTickets()
+            mockDB.getPendingTickets = jest.fn().mockRejectedValueOnce(dbError);
+
+            // Mock Request
+            const mockReq = {
+
+            };
+
+            //Call getPendingTickets()
+            await adminRouter.getPendingTickets(mockReq, mockRes, mockNext);
+
+            expect(mockRes.json).not.toHaveBeenCalled();
+            expect(mockRes.send).not.toHaveBeenCalled();
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            expect(mockNext).toHaveBeenCalledWith(dbError);
+        })
+
+    });
+
+    describe('getAnsweredTickets() Tests', () => {
+
+        test('getAnsweredTickets() should get all answered tickets from database', async () => {
+
+            // Users
+            const data = {
+                tickets: ['tickets']
+            };
+
+            // Mock getAnsweredTickets()
+            mockDB.getAnsweredTickets = jest.fn().mockResolvedValueOnce(data.tickets);
+
+            // Mock Request
+            const mockReq = { };
+
+            // Call getAnsweredTickets()
+            await adminRouter.getAnsweredTickets(mockReq, mockRes, mockNext);
+
+            expect(mockRes.json).not.toHaveBeenCalled();
+            expect(mockRes.send).toHaveBeenCalledTimes(1);
+            expect(mockRes.send).toHaveBeenCalledWith(data.users);
+            expect(mockNext).not.toHaveBeenCalled();
+        });
+
+        test('getAnsweredTickets() should not get answered tickets with a DB error', async () => {
+
+            // DB error
+            const dbError = new Error('DB');
+
+            // Mock getAnsweredTickets()
+            mockDB.getAnsweredTickets = jest.fn().mockRejectedValueOnce(dbError);
+
+            // Mock Request
+            const mockReq = {
+
+            };
+
+            //Call getAnsweredTickets()
+            await adminRouter.getAnsweredTickets(mockReq, mockRes, mockNext);
+
+            expect(mockRes.json).not.toHaveBeenCalled();
+            expect(mockRes.send).not.toHaveBeenCalled();
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            expect(mockNext).toHaveBeenCalledWith(dbError);
+        })
+
+    });
+
+    describe('updateTicket() Tests', () => {
+
+        test('updateTicket() should update the ticket from DB', async () => {
+
+            // Data
+            const data = {}
+
+            // Mock updateTicket()
+            mockDB.updateTicket = jest.fn().mockResolvedValueOnce(data);
+
+            // Mock Request
+            const mockReq = {
+                body: data
+            };
+
+            // Call updateTicket()
+            await adminRouter.updateTicket(mockReq, mockRes, mockNext);
+
+            expect(mockRes.json).not.toHaveBeenCalled();
+            expect(mockRes.send).toHaveBeenCalledTimes(1);
+            expect(mockRes.send).toHaveBeenCalledWith(data);
+            expect(mockNext).not.toHaveBeenCalled();
+
+        });
+
+        test('updateTicket() should not update the ticket with a DB error', async () => {
+
+            // Input
+            const data = {};
+
+            // DB error
+            const dbError = new Error('DB');
+
+            // Mock updateTicket()
+            mockDB.updateTicket = jest.fn().mockRejectedValueOnce(dbError);
+
+            // Mock Request
+            const mockReq = {
+                body: data
+            };
+
+            // Call updateTicket()
+            await adminRouter.updateTicket(mockReq, mockRes, mockNext);
 
             expect(mockRes.json).not.toHaveBeenCalled();
             expect(mockRes.send).not.toHaveBeenCalled();
