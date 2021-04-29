@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { Badge, Col, Container, Jumbotron, Media, Row } from "react-bootstrap";
 
+// Custom useFetch hook to call APIs needed for new page
 const useFetch = () => {
     const [news, setNews] = useState(null);
     const [isLoading, setLoading] = useState(true);
@@ -11,11 +12,13 @@ const useFetch = () => {
     const prevDate = formatDate(new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000));
     const url = "https://newsapi.org/v2/everything?q=covid19&language=en&from=" + prevDate + "&to=" + curDate + "&sortBy=popularity&apiKey=" + key;
 
+    // Date formatting for API call
     function formatDate(input) {
         let date = input.getFullYear() + '-' + (input.getMonth() + 1) + '-' + input.getDate();
         return date;
     }
 
+    // Duplication removal algorithm to solve article duplication bug
     function filterArticles(articles) {
         const seen = new Set();
         const filtered = articles.filter(article => {
@@ -26,13 +29,18 @@ const useFetch = () => {
         return filtered;
     }
 
-    useEffect(async () => {
-        const response = await fetch(url, {
-            "method": "GET",
-        });
-        const data = await response.json();
-        setNews(filterArticles(data.articles));
-        setLoading(false);
+    // On page render, calls API to retrieve news data
+    // On security issues with this call therefore it's safe to call it in the front end
+    useEffect(() => {
+        async function fetchData() {
+            const response = await fetch(url, {
+                "method": "GET",
+            });
+            const data = await response.json();
+            setNews(filterArticles(data.articles));
+            setLoading(false);
+        }
+        fetchData();
     }, []);
 
     return { news, isLoading };
@@ -41,11 +49,13 @@ const useFetch = () => {
 const News = () => {
     const { news, isLoading } = useFetch();
 
+    // On click, opens news article in new page
     const openInNewTab = (url) => {
         const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
         if (newWindow) newWindow.opener = null
     }
 
+    // On mouse hover, changes link color to #0078ff and underlines 
     const onMouseOver = event => {
         const el = event.target;
         el.style.color = "#0078ff";
@@ -53,6 +63,7 @@ const News = () => {
         el.style.textDecoration = "underline"
     };
 
+    // On mouse leave, changes link color back to white and removes underline
     const onMouseOut = event => {
         const el = event.target;
         el.style.color = "white";
@@ -91,6 +102,8 @@ const News = () => {
                     <Container>
                         <Row>
                             {news.slice(1, 6).map((article) => {
+
+                                // On mouse hover, changes link color to #0078ff and underlines
                                 const onMouseOver = event => {
                                     const el = event.target;
                                     el.style.color = "#0078ff";
@@ -98,14 +111,16 @@ const News = () => {
                                     el.style.textDecoration = "underline"
                                 };
 
+                                // On mouse leave, changes link color back to blue and removes underline
                                 const onMouseOut = event => {
                                     const el = event.target;
                                     el.style.color = "blue";
                                     el.style.textDecoration = "none"
                                 };
 
+                                // The first 6 articles except the first article, display in singular row under jumbotron
                                 return (
-                                    <Col key={ Math.random().toString(36).substr(2, 9) }>
+                                    <Col key={Math.random().toString(36).substr(2, 9)}>
                                         <Media>
                                             <Media.Body>
                                                 <img
@@ -128,19 +143,22 @@ const News = () => {
                             })}
                         </Row>
                         {news.slice(6).map((article) => {
+                            // On mouse hover, changes link color to #0078ff
                             const onMouseOver = event => {
                                 const el = event.target;
                                 el.style.color = "#0078ff";
                                 el.style.cursor = "pointer";
                             };
 
+                            // On mouse leave, changes link color back to white
                             const onMouseOut = event => {
                                 const el = event.target;
                                 el.style.color = "#000000";
                             };
 
+                            // For every article after the 7th article, display each article within its own row
                             return (
-                                <Media key={ Math.random().toString(36).substr(2, 9) } style={{ paddingTop: "25px", paddingBottom: "25px" }}>
+                                <Media key={Math.random().toString(36).substr(2, 9)} style={{ paddingTop: "25px", paddingBottom: "25px" }}>
                                     <img
                                         width={320}
                                         height={200}

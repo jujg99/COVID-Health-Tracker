@@ -2477,6 +2477,115 @@ describe('Database Tests', () => {
 
     });
 
+    describe('getUserCounts() Tests', () => {
+
+        test('getUserCounts() should get # of users, admins, and atRisk users', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Counts
+            const counts = {
+                userCount: 0,
+                adminCount: 0,
+                atRiskCount: 0
+            };
+
+            // Call getUserCounts()
+            const promise = database.getUserCounts();
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(null);
+
+            // Extract query Callback
+            const queryCallback = mockConnection.query.mock.calls[1][2];
+
+            // Call connect Callback
+            queryCallback(null, counts);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).toHaveBeenCalledTimes(2);
+            await expect(promise).resolves.toEqual(counts);
+
+        });
+
+        test('getUserCounts() should not retrieve counts with a connection error', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Counts
+            const counts = {
+                userCount: 0,
+                adminCount: 0,
+                atRiskCount: 0
+            };
+
+            // Connection Error
+            const error = new Error('connection');
+
+            // Call getUserCounts()
+            const promise = database.getUserCounts();
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(error);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).not.toHaveBeenCalled();
+            await expect(promise).rejects.toEqual(error);
+
+        });
+
+        test('getUserCounts() should not retrieve counts with a query error', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Counts
+            const counts = {
+                userCount: 0,
+                adminCount: 0,
+                atRiskCount: 0
+            };
+
+            // Connection Error
+            const error = new Error('query');
+
+            // Call getUserCounts()
+            const promise = database.getUserCounts();
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(null);
+
+            // Extract query Callback
+            const queryCallback = mockConnection.query.mock.calls[1][2];
+
+            // Call connect Callback
+            queryCallback(error);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).toHaveBeenCalledTimes(2);
+            await expect(promise).rejects.toEqual(error);
+
+        });
+
+    });
+
     describe('getTickets() Tests', () => {
 
         test('getTickets() should get the tickets of an existing user', async () => {
@@ -2580,6 +2689,304 @@ describe('Database Tests', () => {
 
     });
 
+    describe('getPendingTickets() Tests', () => {
+
+        test('getPendingTickets() should get all unanswered tickets', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Tickets
+            const tickets = [
+                {
+                    ticket: 'ticket1'
+                },
+                {
+                    ticket: 'ticket2'
+                }
+            ];
+
+            // Call getPendingTickets()
+            const promise = database.getPendingTickets();
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(null);
+
+            // Extract query Callback
+            const queryCallback = mockConnection.query.mock.calls[1][1];
+
+            // Call connect Callback
+            queryCallback(null, tickets);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).toHaveBeenCalledTimes(2);
+            await expect(promise).resolves.toEqual(tickets);
+
+        });
+
+        test('getPendingTickets() should not get all pending tickets with a connection error', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Tickets
+            const tickets = [
+                {
+                    ticket: 'ticket1'
+                },
+                {
+                    ticket: 'ticket2'
+                }
+            ];
+
+            // Connection Error
+            const error = new Error('connection');
+
+            // Call getPendingTickets()
+            const promise = database.getPendingTickets();
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(error);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).not.toHaveBeenCalled();
+            await expect(promise).rejects.toEqual(error);
+
+        });
+
+        test('getPendingTickets() should not get all users with a query error', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Tickets
+            const tickets = [
+                {
+                    ticket: 'ticket1'
+                },
+                {
+                    ticket: 'ticket2'
+                }
+            ];
+
+            // Query Error
+            const error = new Error('query');
+
+            // Call getPendingTickets()
+            const promise = database.getPendingTickets();
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(null);
+
+            // Extract query Callback
+            const queryCallback = mockConnection.query.mock.calls[1][1];
+
+            // Call connect Callback
+            queryCallback(error, tickets);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).toHaveBeenCalledTimes(2);
+            await expect(promise).rejects.toEqual(error);
+
+        });
+
+        test('getPendingTickets() should return empty array if nonexistent pending tickets', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Tickets
+            const tickets = [];
+
+            // Call getPendingTickets()
+            const promise = database.getPendingTickets();
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(null);
+
+            // Extract query Callback
+            const queryCallback = mockConnection.query.mock.calls[1][1];
+
+            // Call connect Callback
+            queryCallback(null, tickets);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).toHaveBeenCalledTimes(2);
+            await expect(promise).resolves.toEqual(tickets);
+
+        });
+
+    });
+
+    describe('getAnsweredTickets() Tests', () => {
+
+        test('getAnsweredTickets() should get all answered tickets', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Tickets
+            const tickets = [
+                {
+                    ticket: 'ticket1'
+                },
+                {
+                    ticket: 'ticket2'
+                }
+            ];
+
+            // Call getAnsweredTickets()
+            const promise = database.getAnsweredTickets();
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(null);
+
+            // Extract query Callback
+            const queryCallback = mockConnection.query.mock.calls[1][1];
+
+            // Call connect Callback
+            queryCallback(null, tickets);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).toHaveBeenCalledTimes(2);
+            await expect(promise).resolves.toEqual(tickets);
+
+        });
+
+        test('getAnsweredTickets() should not get all answered tickets with a connection error', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Tickets
+            const tickets = [
+                {
+                    ticket: 'ticket1'
+                },
+                {
+                    ticket: 'ticket2'
+                }
+            ];
+
+            // Connection Error
+            const error = new Error('connection');
+
+            // Call getAnsweredTickets()
+            const promise = database.getAnsweredTickets();
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(error);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).not.toHaveBeenCalled();
+            await expect(promise).rejects.toEqual(error);
+
+        });
+
+        test('getAnsweredTickets() should not get all users with a query error', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Tickets
+            const tickets = [
+                {
+                    ticket: 'ticket1'
+                },
+                {
+                    ticket: 'ticket2'
+                }
+            ];
+
+            // Query Error
+            const error = new Error('query');
+
+            // Call getAnsweredTickets()
+            const promise = database.getAnsweredTickets();
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(null);
+
+            // Extract query Callback
+            const queryCallback = mockConnection.query.mock.calls[1][1];
+
+            // Call connect Callback
+            queryCallback(error, tickets);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).toHaveBeenCalledTimes(2);
+            await expect(promise).rejects.toEqual(error);
+
+        });
+
+        test('getAnsweredTickets() should return empty array if nonexistent answered tickets', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Tickets
+            const tickets = [];
+
+            // Call getAnsweredTickets()
+            const promise = database.getAnsweredTickets();
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(null);
+
+            // Extract query Callback
+            const queryCallback = mockConnection.query.mock.calls[1][1];
+
+            // Call connect Callback
+            queryCallback(null, tickets);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).toHaveBeenCalledTimes(2);
+            await expect(promise).resolves.toEqual(tickets);
+
+        });
+
+    });
+
     describe('insertTicket() Tests', () => {
 
         test('insertTicket() should insert a ticket for an existing user', async () => {
@@ -2675,6 +3082,111 @@ describe('Database Tests', () => {
 
             // Call connect Callback
             queryCallback(error, [ticket]);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).toHaveBeenCalledTimes(2);
+            await expect(promise).rejects.toEqual(error);
+
+        });
+
+    });
+
+    describe('updateTicket() Tests', () => {
+
+        test('updateTicket() should update an existing ticket', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Data
+            const data = {
+                answer: 'answer',
+                username: 'username',
+                question: 'question'
+            };
+
+            // Call updateTicket()
+            const promise = database.updateTicket(data);
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(null);
+
+            // Extract query Callback
+            const queryCallback = mockConnection.query.mock.calls[1][2];
+
+            // Call connect Callback
+            queryCallback(null);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).toHaveBeenCalledTimes(2);
+            await expect(promise).resolves.toEqual('Update Successful');
+
+        });
+
+        test('updateTicket() should not update a ticket with a connection error', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Data
+            const data = {
+                username: 'username'
+            };
+
+            // Connection Error
+            const error = new Error('connection');
+
+            // Call updateTicket()
+            const promise = database.updateTicket(data);
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(error);
+
+            expect(mysql.createConnection).toHaveBeenCalledTimes(1);
+            expect(mockConnection.connect).toHaveBeenCalledTimes(1);
+            expect(mockConnection.end).toHaveBeenCalledTimes(1);
+            expect(mockConnection.query).not.toHaveBeenCalled();
+            await expect(promise).rejects.toEqual(error);
+
+        });
+
+        test('updateTicket() should not update a ticket with a query error', async () => {
+
+            // Mock createConnection()
+            mysql.createConnection.mockReturnValue(mockConnection);
+
+            // Data
+            const data = {
+                username: 'username'
+            };
+
+            // Connection Error
+            const error = new Error('query');
+
+            // Call updateTicket()
+            const promise = database.updateTicket(data);
+
+            // Extract connect Callback
+            const connectCallback = mockConnection.connect.mock.calls[0][0];
+
+            // Call connect Callback
+            connectCallback(null);
+
+            // Extract query Callback
+            const queryCallback = mockConnection.query.mock.calls[1][2];
+
+            // Call connect Callback
+            queryCallback(error);
 
             expect(mysql.createConnection).toHaveBeenCalledTimes(1);
             expect(mockConnection.connect).toHaveBeenCalledTimes(1);

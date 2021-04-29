@@ -6,15 +6,23 @@ import user from '../images/user.png';
 import gears from '../images/gears.png';
 import virus from '../images/virus.png';
 
+// Custom useFetch hook to call APIs needed for admin pages
 const useFetch = () => {
   const [users, setUsers] = useState(null);
   const [counts, setCounts] = useState(null);
+  const [pendingTickets, setPendingTickets] = useState(null);
+  const [answeredTickets, setAnsweredTickets] = useState(null);
   const [isLoading, setLoading] = useState(true);
 
   function createUserData(name, username, age, atRisk, city, state) {
     return { name, username, age, atRisk, city, state };
   }
 
+  function createTicketData(username, ticketId, date, question, answer) {
+    return { username, ticketId, date, question, answer };
+  }
+
+  // Formats JSON data to users object
   function setupUsers(users) {
     const arr = [];
     for (let i = 0; i < users.length; i++) {
@@ -23,28 +31,57 @@ const useFetch = () => {
     setUsers(arr);
   }
 
-  useEffect(async () => {
-    const userRes = await fetch('http://localhost:8080/admin/users');
-    const userData = await userRes.json();
-    setupUsers(userData);
+  // Formats JSON data to tickets object
+  function setupTickets(tickets, answered) {
+    const arr = [];
+    for(let i = 0; i < tickets.length; i++) {
+      arr.push(createTicketData(tickets[i].username, tickets[i].ticket_id, tickets[i].date, tickets[i].question, tickets[i].answer));
+    }
 
-    const countRes = await fetch('http://localhost:8080/admin/counts');
-    const countData = await countRes.json();
-    setCounts(countData);
+    if (answered) {
+      setAnsweredTickets(arr);
+    } else {
+      setPendingTickets(arr);
+    }
+  }
 
-    setLoading(false);
+  // On page render, call all APIs to retrieve all data
+  useEffect(() => {
+    async function fetchData() {
+      const userRes = await fetch('http://localhost:8080/admin/users');
+      const userData = await userRes.json();
+      setupUsers(userData);
+
+      const countRes = await fetch('http://localhost:8080/admin/counts');
+      const countData = await countRes.json();
+      setCounts(countData);
+
+      const pendingRes = await fetch('http://localhost:8080/admin/tickets/pending')
+      const pendingData = await pendingRes.json();
+      setupTickets(pendingData, false);
+
+      const answeredRes = await fetch('http://localhost:8080/admin/tickets/answered')
+      const answeredData = await answeredRes.json();
+      setupTickets(answeredData, true);
+
+      // After all API calls, setLoading to false to fully load page
+      setLoading(false);
+    }
+    fetchData();
   }, []);
 
-  return { users, counts, isLoading };
+  return { users, counts, pendingTickets, answeredTickets, isLoading };
 };
 
 const Admin = () => {
-  const { users, counts, isLoading } = useFetch();
+  const { users, counts, pendingTickets, answeredTickets, isLoading } = useFetch();
 
+  // Displays counts (# of users, # of admins, # of atRisk users) in jumbotron
+  // Displays two boxes that links to Users page and Tickets page
   return (
     <>
       {isLoading ? <div>Loading...</div> :
-        <div style={{ backgroundColor: '#408cb3', height: '100vh' }}>
+        <div style={{ backgroundColor: '#408cb3', height: '120vh' }}>
           <Jumbotron fluid style={{ background: 'white' }}>
             <Container>
               <Row>
@@ -88,13 +125,14 @@ const Admin = () => {
               <Col>
                 <Card border="dark" style={{ width: '18rem', padding: '20px' }}>
                   <Card.Body>
-                    <Link to={{ pathname: '/admin/tickets' }}><h5>Tickets</h5></Link>
+                    <Link to={{ pathname: '/admin/tickets', state: [pendingTickets, answeredTickets], }}><h5>Tickets</h5></Link>
                     <Card.Text>View, manage, and respond to user tickets.</Card.Text>
                   </Card.Body>
                 </Card>
               </Col>
             </Row>
           </Container>
+          <br></br><br></br>
         </div>
       }
     </>

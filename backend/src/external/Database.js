@@ -283,8 +283,8 @@ class Database {
             DELETE FROM symptoms WHERE username = ?;
             DELETE FROM travels WHERE username = ?;
             DELETE FROM tests WHERE username = ?;
-            DELETE FROM users WHERE username = ?;
-            DELETE FROM tickets WHERE username = ?;`;
+            DELETE FROM tickets WHERE username = ?;
+            DELETE FROM users WHERE username = ?;`;
         connection.query(updateQuery, [data.username, data.username, data.username, data.username, data.username], (err) => {
           connection.end();
           if (err) {
@@ -622,6 +622,62 @@ class Database {
     });
   }
 
+  getPendingTickets() {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query('USE cht');
+        const selectQuery = `SELECT * FROM tickets WHERE answered = '0'`;
+        connection.query(selectQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          if (rows.length === 0) {
+            return resolve([]);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
+  getAnsweredTickets() {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query('USE cht');
+        const selectQuery = `SELECT * FROM tickets WHERE answered = '1'`;
+        connection.query(selectQuery, (err, rows) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          if (rows.length === 0) {
+            return resolve([]);
+          }
+          return resolve(rows);
+        });
+      });
+    });
+  }
+
   insertTicket(username, question) {
     return new Promise((resolve, reject) => {
       const connection = mysql.createConnection({
@@ -664,6 +720,31 @@ class Database {
     });
   }
 
+  updateTicket(data) {
+    return new Promise((resolve, reject) => {
+      const connection = mysql.createConnection({
+        host: this.DB_HOST,
+        user: this.DB_USER,
+        password: this.DB_PASSWORD,
+        multipleStatements: true,
+      });
+      connection.connect((err) => {
+        if (err) {
+          connection.end();
+          return reject(err);
+        }
+        connection.query("USE cht");
+        const updateQuery = `UPDATE tickets SET answer=?, answered=1 WHERE username=? AND question=?;`;
+        connection.query(updateQuery, [data.answer, data.username, data.question], (err) => {
+          connection.end();
+          if (err) {
+            return reject(err);
+          }
+          return resolve("Update Successful");
+        });
+      });
+    });
+  }
 }
 
 module.exports = Database;

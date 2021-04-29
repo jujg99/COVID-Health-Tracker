@@ -14,6 +14,7 @@ const Users = () => {
     const { state } = useLocation();
     const [rows, setRows] = useState(state);
 
+    // Custom comparator to order object a and b based on orderBy
     function descendingComparator(a, b, orderBy) {
         if (b[orderBy] < a[orderBy]) {
             return -1;
@@ -24,12 +25,14 @@ const Users = () => {
         return 0;
     }
 
+    // Based on order (desc or asc) returns descendingComparator (- or + respectively)
     function getComparator(order, orderBy) {
         return order === 'desc'
             ? (a, b) => descendingComparator(a, b, orderBy)
             : (a, b) => -descendingComparator(a, b, orderBy);
     }
 
+    // Stabilizes array then sorts the contents of array
     function stableSort(array, comparator) {
         const stabilizedThis = array.map((el, index) => [el, index]);
         stabilizedThis.sort((a, b) => {
@@ -40,6 +43,7 @@ const Users = () => {
         return stabilizedThis.map((el) => el[0]);
     }
 
+    // Header names of user table
     const headCells = [
         { id: 'name', disablePadding: true, label: 'Name' },
         { id: 'username', disablePadding: false, label: 'Username' },
@@ -49,6 +53,7 @@ const Users = () => {
         { id: 'state', disablePadding: false, label: 'State' },
     ];
 
+    // Custom table head for user table with specific functions (selecting all, sorting, etc.)
     function EnhancedTableHead(props) {
         const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
         const createSortHandler = (property) => (event) => {
@@ -101,6 +106,7 @@ const Users = () => {
         rowCount: PropTypes.number.isRequired,
     };
 
+    // CSS styles for table toolbar 
     const useToolbarStyles = makeStyles((theme) => ({
         root: {
             paddingLeft: theme.spacing(2),
@@ -121,10 +127,12 @@ const Users = () => {
         },
     }));
 
+    // Custom table toolbar (above table header) for specific functions (deleting users, searching users, etc.)
     const EnhancedTableToolbar = (props) => {
         const classes = useToolbarStyles();
         const { numSelected, selected } = props;
 
+        // Upon user delete, remove user from table 
         const deleteUsers = () => {
             selected.map(username => handleDelete(username));
             const newRows = rows.filter((row) => !selected.includes(row.username));
@@ -165,6 +173,7 @@ const Users = () => {
         numSelected: PropTypes.number.isRequired,
     };
 
+    // CSS for user table
     const useStyles = makeStyles((theme) => ({
         root: {
             width: '100%',
@@ -197,12 +206,14 @@ const Users = () => {
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
+    // Event handler, detects whether column is ascending or descending 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
     };
 
+    // Event handler for when select all is clicked
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
             const newSelecteds = filteredRows.map((n) => n.username);
@@ -212,6 +223,7 @@ const Users = () => {
         setSelected([]);
     };
 
+    // Event handler for when specific row is clicked
     const handleClick = (event, username) => {
         const selectedIndex = selected.indexOf(username);
         let newSelected = [];
@@ -232,19 +244,23 @@ const Users = () => {
         setSelected(newSelected);
     };
 
+    // Event handler for when next page is clicked
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
 
+    // Event handler for when # of rows per page is changed
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
+    // Event handler for when page density is clicked
     const handleChangeDense = (event) => {
         setDense(event.target.checked);
     };
 
+    // Event handler for when user delete button is clicked
     const handleDelete = (username) => {
         const data = {
             username: username,
@@ -264,6 +280,7 @@ const Users = () => {
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
     const [searched, setSearched] = useState("");
 
+    // Updates user table when search bar is updated
     const requestSearch = (searchedVal, rows) => {
         setSearched(searchedVal);
         const newRows = rows.filter((row) => {
@@ -272,6 +289,7 @@ const Users = () => {
         setFilteredRows(newRows);
     };
 
+    // Resets search bar and user table when search is canceled
     const cancelSearch = () => {
         setSearched("");
         requestSearch(searched, rows);
