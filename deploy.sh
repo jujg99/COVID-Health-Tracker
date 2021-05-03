@@ -31,6 +31,8 @@ sudo mysql_secure_installation
 sudo mysql
 # Run ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
 # Run FLUSH PRIVILEGES;
+# Run source ./database/database.sql;
+# Run source ./database/tables.sql;
 # Run exit
 sudo apt install nodejs
 sudo apt install npm
@@ -43,8 +45,6 @@ yarn start > /dev/null 2>&1 &
 disown
 cd ..
 
-# Copy nginx configuration
-nginx_default > /etc/nginx/sites-available/default
+# Copy nginx configuration in nginx_default to /etc/nginx/sites-available/default
 
-# Run NGINX
-sudo service nginx restart
+# Run sudo service nginx restart
