@@ -106,7 +106,7 @@ const Users = () => {
         rowCount: PropTypes.number.isRequired,
     };
 
-    // CSS styles for table toolbar 
+    // CSS styles for table toolbar
     const useToolbarStyles = makeStyles((theme) => ({
         root: {
             paddingLeft: theme.spacing(2),
@@ -132,7 +132,7 @@ const Users = () => {
         const classes = useToolbarStyles();
         const { numSelected, selected } = props;
 
-        // Upon user delete, remove user from table 
+        // Upon user delete, remove user from table
         const deleteUsers = () => {
             selected.map(username => handleDelete(username));
             const newRows = rows.filter((row) => !selected.includes(row.username));
@@ -206,7 +206,7 @@ const Users = () => {
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-    // Event handler, detects whether column is ascending or descending 
+    // Event handler, detects whether column is ascending or descending
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -266,7 +266,7 @@ const Users = () => {
             username: username,
         };
         return axios
-            .post("http://localhost:8080/admin/delete", data)
+            .post("/admin/delete", data)
             .then((response) => {
                 console.log(response);
             })

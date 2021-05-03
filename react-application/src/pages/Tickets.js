@@ -41,7 +41,7 @@ const Tickets = () => {
 
       // API call to backend to update ticket
       return axios
-        .post("http://localhost:8080/admin/tickets/update", data)
+        .post("/admin/tickets/update", data)
         .then((response) => {
           console.log(response);
         })

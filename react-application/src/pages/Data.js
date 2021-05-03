@@ -43,8 +43,8 @@ export default class Data extends Component {
 
   componentDidMount() {
     Promise.all([
-      axios.get("http://localhost:8080/data/continents"), // get data for continents
-      axios.get("http://localhost:8080/data/states"), // get data for states
+      axios.get("/data/continents"), // get data for continents
+      axios.get("/data/states"), // get data for states
     ])
       .then(([result1, result2]) => {
         this.setState({

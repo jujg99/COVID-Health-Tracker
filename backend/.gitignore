@@ -2,7 +2,7 @@
 node_modules/
 
 # Build
-public/*
+# public/*
 !public/.REACT_BUILD_HERE
 
 # .env Files

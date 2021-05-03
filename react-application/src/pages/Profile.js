@@ -184,7 +184,7 @@ const Profile = () => {
   // get symptoms of user
   function getSymptoms() {
     return axios
-      .post("http://localhost:8080/profile/symptoms", { username: currentUser })
+      .post("/profile/symptoms", { username: currentUser })
       .then((response) => {
         setSymptoms(response.data.symptoms);
       })
@@ -196,7 +196,7 @@ const Profile = () => {
   // get test results of user
   function getTestResults() {
     return axios
-      .post("http://localhost:8080/profile/tests", { username: currentUser })
+      .post("/profile/tests", { username: currentUser })
       .then((response) => {
         setTestResults(response.data.tests);
       })
@@ -231,7 +231,7 @@ const Profile = () => {
 
       // now find severity
       axios
-        .post("http://localhost:8080/profile/ageAndRisk", {
+        .post("/profile/ageAndRisk", {
           username: currentUser,
         })
         .then((response) => {
@@ -296,7 +296,7 @@ const Profile = () => {
       other: other,
     };
     return axios
-      .post("http://localhost:8080/profile/submitSymptoms", data)
+      .post("/profile/submitSymptoms", data)
       .then((response) => {
         getSymptoms(); //update symptom table again with new input
         setCurrentInput("Your symptoms have been successfully submitted.");
@@ -318,7 +318,7 @@ const Profile = () => {
       result: testResult,
     };
     return axios
-      .post("http://localhost:8080/profile/submitTestResults", data)
+      .post("/profile/submitTestResults", data)
       .then((response) => {
         getTestResults(); //update test result table
         setDate(new Date());
@@ -488,7 +488,7 @@ const Profile = () => {
       other: other,
     };
     return axios
-      .post("http://localhost:8080/profile/editSymptom", data)
+      .post("/profile/editSymptom", data)
       .then((response) => {
         getSymptoms(); //update symptom table
         setSymptomEditScreen(false); // close edit screen
@@ -510,7 +510,7 @@ const Profile = () => {
       result: testResult,
     };
     return axios
-      .post("http://localhost:8080/profile/editTest", data)
+      .post("/profile/editTest", data)
       .then((response) => {
         getTestResults(); //update test result table
         setTestEditScreen(false); //close test edit screen
@@ -533,7 +533,7 @@ const Profile = () => {
         id: symptoms[selectedRow[0].index].textid,
       };
       return axios
-        .post("http://localhost:8080/profile/deleteSymptom", data)
+        .post("/profile/deleteSymptom", data)
         .then((response) => {
           setCurrentInput("The row has been successfully deleted.");
           setShowConfirmation(true);
@@ -548,7 +548,7 @@ const Profile = () => {
         id: testResults[selectedRow[0].index].textid,
       };
       return axios
-        .post("http://localhost:8080/profile/deleteTest", data)
+        .post("/profile/deleteTest", data)
         .then((response) => {
           setCurrentInput("The row has been successfully deleted.");
           setShowConfirmation(true);

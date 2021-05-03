@@ -41,7 +41,7 @@ export default class Vaccine extends Component {
     //data to be sent to backend
     const data = { zip: this.state.zip, distance: this.state.distance };
     axios
-      .post("http://localhost:8080/location/vaccine", data)
+      .post("/location/vaccine", data)
       .then((response) => {
         if (response.data === "No match") {
           //no vaccine locations

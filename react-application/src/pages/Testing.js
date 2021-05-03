@@ -47,7 +47,7 @@ export class Testing extends Component {
       } else {
         const pos = this.state.currentPosition;
         return axios
-          .post("http://localhost:8080/location/testing", pos) // get testing locations
+          .post("/location/testing", pos) // get testing locations
           .then((response) => {
             this.setState({ places: response.data.results });
           })

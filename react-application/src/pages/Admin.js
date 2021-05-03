@@ -48,19 +48,19 @@ const useFetch = () => {
   // On page render, call all APIs to retrieve all data
   useEffect(() => {
     async function fetchData() {
-      const userRes = await fetch('http://localhost:8080/admin/users');
+      const userRes = await fetch('/admin/users');
       const userData = await userRes.json();
       setupUsers(userData);
 
-      const countRes = await fetch('http://localhost:8080/admin/counts');
+      const countRes = await fetch('/admin/counts');
       const countData = await countRes.json();
       setCounts(countData);
 
-      const pendingRes = await fetch('http://localhost:8080/admin/tickets/pending')
+      const pendingRes = await fetch('/admin/tickets/pending')
       const pendingData = await pendingRes.json();
       setupTickets(pendingData, false);
 
-      const answeredRes = await fetch('http://localhost:8080/admin/tickets/answered')
+      const answeredRes = await fetch('/admin/tickets/answered')
       const answeredData = await answeredRes.json();
       setupTickets(answeredData, true);
 
