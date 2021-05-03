@@ -36,19 +36,9 @@ sudo apt install nodejs
 sudo apt install npm
 sudo npm install --global yarn
 
-# Install Dependencies
-cd react-application
-yarn
-cd ..
+# Install Dependencies and Run backend in background
 cd backend
 yarn
-cd ..
-
-# Build and Copy React Build
-./copy_react_build.sh
-
-# Run backend in background
-cd backend
 yarn start > /dev/null 2>&1 &
 disown
 cd ..
