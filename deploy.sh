@@ -3,7 +3,7 @@
 ###
 # Run on AWS EC2 with AMI for Ubuntu 20.04 LTS 64-bit x86
 # Use t2.micro
-# Configure Security Group and ACLs https://aws.amazon.com/premiumsupport/knowledge-center/connect-http-https-ec2/
+# Configure Security Group for HTTP only https://aws.amazon.com/premiumsupport/knowledge-center/connect-http-https-ec2/
 # Create / Choose a key pair for remote login
 # SSH into the instance
 # Clone git repository
@@ -50,6 +50,7 @@ cd ..
 # Run backend in background
 cd backend
 yarn start > /dev/null 2>&1 &
+disown
 cd ..
 
 # Copy nginx configuration
