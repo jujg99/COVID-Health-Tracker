@@ -32,7 +32,7 @@ const Help = () => {
   // GET /tickets/:username
   async function getTickets(username) {
     try {
-      const response = await fetch(`http://localhost:8080/tickets/${username}`, {
+      const response = await fetch(`/tickets/${username}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ const Help = () => {
   // PUT /tickets/:username
   async function putTicket(username, args) {
     try {
-      const response = await fetch(`http://localhost:8080/tickets/${username}`, {
+      const response = await fetch(`/tickets/${username}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

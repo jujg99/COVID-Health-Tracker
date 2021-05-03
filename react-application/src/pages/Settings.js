@@ -29,7 +29,7 @@ const Settings = () => {
     // GET /user/profile/:username
     async function getProfile(username) {
         try {
-            const response = await fetch(`http://localhost:8080/user/profile/${username}`, {
+            const response = await fetch(`/user/profile/${username}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ const Settings = () => {
     // PATCH /user/profile/:username
     async function patchProfile(username, args) {
         try {
-            const response = await fetch(`http://localhost:8080/user/profile/${username}`, {
+            const response = await fetch(`/user/profile/${username}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
